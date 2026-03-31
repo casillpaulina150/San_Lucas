@@ -5,20 +5,23 @@ def obtener_doctores_panel():
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
 
-    sql = """
-        SELECT 
-            d.id_doctor,
-            d.nombre,
-            d.apellido_paterno,
-            d.apellido_materno,
-            e.nombre AS especialidad
-        FROM doctores d
-        INNER JOIN especialidades e
-            ON d.id_especialidad = e.id_especialidad
-        ORDER BY d.nombre, d.apellido_paterno
+    query = """
+        SELECT
+            id_doctor,
+            nombre,
+            apellido_paterno,
+            CASE
+                WHEN id_especialidad = 1 THEN 'Nutriología'
+                WHEN id_especialidad = 2 THEN 'Dermatología'
+                WHEN id_especialidad = 3 THEN 'Obstetricia'
+                WHEN id_especialidad = 4 THEN 'Psicología'
+                ELSE 'Sin especialidad'
+            END AS especialidad
+        FROM doctores
+        ORDER BY id_especialidad, nombre
     """
 
-    cursor.execute(sql)
+    cursor.execute(query)
     doctores = cursor.fetchall()
 
     cursor.close()
@@ -109,6 +112,41 @@ def obtener_citas_por_doctor_y_filtro(id_doctor, filtro):
         """
 
     cursor.execute(sql, (id_doctor,))
+    citas = cursor.fetchall()
+
+    cursor.close()
+    conexion.close()
+
+    return citas
+
+from datos.conexion import obtener_conexion
+
+def obtener_citas_calendario():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+
+    query = """
+        SELECT
+            c.id_cita,
+            c.id_doctor,
+            c.fecha,
+            TIME_FORMAT(c.hora, '%H:%i:%s') AS hora,
+            CONCAT(d.nombre, ' ', d.apellido_paterno) AS doctor,
+            CASE
+                WHEN d.id_especialidad = 1 THEN 'Nutriología'
+                WHEN d.id_especialidad = 2 THEN 'Dermatología'
+                WHEN d.id_especialidad = 3 THEN 'Obstetricia'
+                WHEN d.id_especialidad = 4 THEN 'Psicología'
+                ELSE 'Sin especialidad'
+            END AS especialidad,
+            CONCAT(p.nombre, ' ', p.apellido_paterno) AS paciente
+        FROM citas c
+        INNER JOIN doctores d ON c.id_doctor = d.id_doctor
+        INNER JOIN pacientes p ON c.id_paciente = p.id_paciente
+        ORDER BY c.fecha, c.hora
+    """
+
+    cursor.execute(query)
     citas = cursor.fetchall()
 
     cursor.close()

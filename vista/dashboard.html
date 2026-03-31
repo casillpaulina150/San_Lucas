@@ -408,61 +408,61 @@
             </div>
         </div>
 
-        <div class="row g-4">
-            <div class="col-md-6 col-xl-4">
-                <a href="{{ url_for('medico.agenda') }}" class="action-card">
-                    <div class="action-icon">
-                        <i class="bi bi-calendar2-week-fill"></i>
-                    </div>
-
-                    <div class="action-title">Agenda</div>
-
-                    <div class="action-desc">
-                        Revisa tus citas programadas, filtra resultados y da seguimiento a la consulta.
-                    </div>
-
-                    <div class="action-link">
-                        Ir a agenda <i class="bi bi-arrow-right-short"></i>
-                    </div>
-                </a>
+ <div class="row g-4">
+    <div class="col-md-6 col-xl-4">
+        <a href="{{ url_for('agenda_bp.agenda') }}" class="action-card">
+            <div class="action-icon">
+                <i class="bi bi-calendar2-week-fill"></i>
             </div>
 
-            <div class="col-md-6 col-xl-4">
-                <a href="{{ url_for('medico.agenda') }}" class="action-card">
-                    <div class="action-icon">
-                        <i class="bi bi-folder2-open"></i>
-                    </div>
+            <div class="action-title">Agenda</div>
 
-                    <div class="action-title">Expedientes</div>
-
-                    <div class="action-desc">
-                        Accede a los expedientes desde tu agenda y consulta el historial clínico de cada paciente.
-                    </div>
-
-                    <div class="action-link">
-                        Ver pacientes en agenda <i class="bi bi-arrow-right-short"></i>
-                    </div>
-                </a>
+            <div class="action-desc">
+                Revisa tus citas programadas, filtra resultados y da seguimiento a la consulta.
             </div>
 
-            <div class="col-md-6 col-xl-4">
-                <a href="{{ url_for('home.inicio') }}" class="action-card">
-                    <div class="action-icon">
-                        <i class="bi bi-house-door-fill"></i>
-                    </div>
-
-                    <div class="action-title">Sitio principal</div>
-
-                    <div class="action-desc">
-                        Regresa a la página principal del sistema y consulta la información pública de la clínica.
-                    </div>
-
-                    <div class="action-link">
-                        Volver al inicio <i class="bi bi-arrow-right-short"></i>
-                    </div>
-                </a>
+            <div class="action-link">
+                Ir a agenda <i class="bi bi-arrow-right-short"></i>
             </div>
-        </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-xl-4">
+        <a href="{{ url_for('medico.expedientes') }}" class="action-card">
+            <div class="action-icon">
+                <i class="bi bi-folder2-open"></i>
+            </div>
+
+            <div class="action-title">Expedientes</div>
+
+            <div class="action-desc">
+                Accede a los expedientes desde tu agenda y consulta el historial clínico de cada paciente.
+            </div>
+
+            <div class="action-link">
+                Ver pacientes en agenda <i class="bi bi-arrow-right-short"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-xl-4">
+        <a href="{{ url_for('home.inicio') }}" class="action-card">
+            <div class="action-icon">
+                <i class="bi bi-house-door-fill"></i>
+            </div>
+
+            <div class="action-title">Sitio principal</div>
+
+            <div class="action-desc">
+                Regresa a la página principal del sistema y consulta la información pública de la clínica.
+            </div>
+
+            <div class="action-link">
+                Volver al inicio <i class="bi bi-arrow-right-short"></i>
+            </div>
+        </a>
+    </div>
+</div>
 
         <div class="row g-4 stats-row mt-1">
             <div class="col-md-4">
@@ -494,7 +494,7 @@
                     <p class="section-text mb-0">Desde aquí puedes abrir el detalle de la consulta o el expediente del paciente.</p>
                 </div>
 
-                <a href="{{ url_for('medico.agenda') }}" class="btn btn-primary btn-soft">
+                <a href="{{ url_for('agenda_bp.agenda') }}" class="btn btn-primary btn-soft">
                     Ver agenda completa
                 </a>
             </div>

@@ -87,6 +87,19 @@ font-weight:600;
 .fc-button{
 border-radius:8px !important;
 }
+.legend-color{
+    width:15px;
+    height:15px;
+    border-radius:4px;
+    margin-right:10px;
+    display:inline-block;
+}
+
+.color-nutriologia{ background:#27ae60; }
+.color-psicologia{ background:#2f80ed; }
+.color-obstetricia{ background:#9b51e0; }
+.color-dermatologia{ background:#f2994a; }
+.color-default{ background:#6c757d; }
 
 </style>
 
@@ -138,27 +151,41 @@ Mis citas
 <div class="card card-soft legend-card">
 
 <div class="legend-title">Doctores</div>
+<p>Total doctores: {{ doctores|length }}</p>
+{% if doctores %}
+    {% for doc in doctores %}
 
-<div class="legend-item">
-<div class="legend-color" style="background:#27ae60"></div>
-Dr. Eduardo — Nutriología
-</div>
+        {% if doc.especialidad == "Nutriología" %}
+            {% set clase_color = "color-nutriologia" %}
+        {% elif doc.especialidad == "Psicología" %}
+            {% set clase_color = "color-psicologia" %}
+        {% elif doc.especialidad == "Obstetricia" %}
+            {% set clase_color = "color-obstetricia" %}
+        {% elif doc.especialidad == "Dermatología" %}
+            {% set clase_color = "color-dermatologia" %}
+        {% else %}
+            {% set clase_color = "color-default" %}
+        {% endif %}
 
-<div class="legend-item">
-<div class="legend-color" style="background:#2f80ed"></div>
-Psicología
-</div>
+        {% if doc.especialidad == "Psicología" %}
+            {% set prefijo = "Lic." %}
+        {% elif doc.nombre == "Andrea" or doc.nombre == "Laura" %}
+            {% set prefijo = "Dra." %}
+        {% else %}
+            {% set prefijo = "Dr." %}
+        {% endif %}
 
-<div class="legend-item">
-<div class="legend-color" style="background:#9b51e0"></div>
-Obstetricia
-</div>
+        <div class="legend-item">
+            <div class="legend-color {{ clase_color }}"></div>
+            {{ prefijo }} {{ doc.nombre }} {{ doc.apellido_paterno }} — {{ doc.especialidad }}
+        </div>
 
-<div class="legend-item">
-<div class="legend-color" style="background:#f2994a"></div>
-Dermatología
-</div>
-
+    {% endfor %}
+{% else %}
+    <div class="legend-item">
+        No hay médicos registrados
+    </div>
+{% endif %}
 <hr>
 
 <button class="btn btn-outline-secondary filter-btn" onclick="verTodas()">
@@ -179,83 +206,77 @@ Ver solo mis citas
 
 
 <script>
-
 let calendar;
-let todasLasCitas=[];
+let todasLasCitas = [];
 
 document.addEventListener('DOMContentLoaded', function() {
 
-const calendarEl=document.getElementById('calendar');
+    const calendarEl = document.getElementById('calendar');
 
-calendar=new FullCalendar.Calendar(calendarEl,{
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'timeGridWeek',
+        locale: 'es',
+        slotMinTime: "08:00:00",
+        slotMaxTime: "20:00:00",
 
-initialView:'timeGridWeek',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
 
-locale:'es',
+        eventTimeFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        },
 
-slotMinTime:"08:00:00",
-slotMaxTime:"20:00:00",
+        events: '/api/citas'
+    });
 
-headerToolbar:{
-left:'prev,next today',
-center:'title',
-right:'dayGridMonth,timeGridWeek,timeGridDay'
-},
+    calendar.render();
 
-events:'/api/citas'
-
+    fetch('/api/citas')
+    .then(res => res.json())
+    .then(data => {
+        todasLasCitas = data;
+    });
 });
 
-calendar.render();
+function activarBoton(btn) {
+    document.getElementById("btnTodas").classList.remove("active", "btn-primary");
+    document.getElementById("btnMias").classList.remove("active", "btn-primary");
 
-fetch('/api/citas')
-.then(res=>res.json())
-.then(data=>{
-todasLasCitas=data
-})
+    document.getElementById("btnTodas").classList.add("btn-outline-primary");
+    document.getElementById("btnMias").classList.add("btn-outline-primary");
 
-});
-
-
-function activarBoton(btn){
-
-document.getElementById("btnTodas").classList.remove("active","btn-primary")
-document.getElementById("btnMias").classList.remove("active","btn-primary")
-
-document.getElementById("btnTodas").classList.add("btn-outline-primary")
-document.getElementById("btnMias").classList.add("btn-outline-primary")
-
-btn.classList.remove("btn-outline-primary")
-btn.classList.add("btn-primary","active")
-
+    btn.classList.remove("btn-outline-primary");
+    btn.classList.add("btn-primary", "active");
 }
 
-
-function verTodas(){
-
-activarBoton(document.getElementById("btnTodas"))
-
-calendar.removeAllEvents()
-
-todasLasCitas.forEach(c=>calendar.addEvent(c))
-
+function verTodas() {
+    activarBoton(document.getElementById("btnTodas"));
+    calendar.removeAllEvents();
+    todasLasCitas.forEach(c => calendar.addEvent(c));
 }
-
 
 function verMias(){
 
-activarBoton(document.getElementById("btnMias"))
+    activarBoton(document.getElementById("btnMias"))
 
-const doctor="{{ doctor }}"
+    const idDoctorActual = Number("{{ id_doctor_actual or 0 }}")
 
-calendar.removeAllEvents()
+    calendar.removeAllEvents()
 
-todasLasCitas
-.filter(c=>c.doctor===doctor)
-.forEach(c=>calendar.addEvent(c))
+    if(!idDoctorActual){
+        return;
+    }
+
+    todasLasCitas
+        .filter(c => Number(c.id_doctor) === idDoctorActual)
+        .forEach(c => calendar.addEvent(c))
 
 }
-
 </script>
 
 </body>

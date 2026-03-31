@@ -393,3 +393,155 @@ def obtener_expediente_completo(id_paciente):
     conexion.close()
 
     return paciente, historial
+
+def obtener_lista_expedientes(busqueda=""):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+
+    query = """
+        SELECT
+            p.id_paciente,
+            p.numero_expediente,
+            p.nombre,
+            p.apellido_paterno,
+            p.apellido_materno,
+            MIN(CONCAT(c.fecha, ' ', c.hora)) AS primera_modificacion,
+            MAX(CONCAT(c.fecha, ' ', c.hora)) AS ultima_modificacion
+        FROM pacientes p
+        LEFT JOIN citas c ON p.id_paciente = c.id_paciente
+        WHERE (%s = ''
+               OR p.numero_expediente LIKE %s
+               OR p.nombre LIKE %s
+               OR p.apellido_paterno LIKE %s
+               OR p.apellido_materno LIKE %s)
+        GROUP BY
+            p.id_paciente,
+            p.numero_expediente,
+            p.nombre,
+            p.apellido_paterno,
+            p.apellido_materno
+        ORDER BY p.numero_expediente ASC
+    """
+
+    like = f"%{busqueda}%"
+    cursor.execute(query, (busqueda, like, like, like, like))
+    resultados = cursor.fetchall()
+
+    cursor.close()
+    conexion.close()
+
+    return resultados
+
+
+def eliminar_expediente(id_paciente):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+
+    try:
+        # 1. Buscar las consultas médicas asociadas al paciente,
+        #    pasando por la tabla citas
+        cursor.execute("""
+            SELECT cm.id_consulta
+            FROM consultas_medicas cm
+            INNER JOIN citas c ON cm.id_cita = c.id_cita
+            WHERE c.id_paciente = %s
+        """, (id_paciente,))
+        consultas = cursor.fetchall()
+
+        ids_consultas = [c["id_consulta"] for c in consultas]
+
+        # 2. Eliminar tablas hijas de consultas_medicas
+        if ids_consultas:
+            placeholders = ",".join(["%s"] * len(ids_consultas))
+
+            cursor.execute(
+                f"DELETE FROM consulta_dermatologia WHERE id_consulta IN ({placeholders})",
+                ids_consultas
+            )
+            cursor.execute(
+                f"DELETE FROM consulta_nutricion WHERE id_consulta IN ({placeholders})",
+                ids_consultas
+            )
+            cursor.execute(
+                f"DELETE FROM consulta_obstetricia WHERE id_consulta IN ({placeholders})",
+                ids_consultas
+            )
+            cursor.execute(
+                f"DELETE FROM consulta_psicologia WHERE id_consulta IN ({placeholders})",
+                ids_consultas
+            )
+
+            # 3. Eliminar consultas médicas generales
+            cursor.execute(
+                f"DELETE FROM consultas_medicas WHERE id_consulta IN ({placeholders})",
+                ids_consultas
+            )
+
+        # 4. Eliminar ficha clínica del paciente
+        cursor.execute("""
+            DELETE FROM ficha_clinica_paciente
+            WHERE id_paciente = %s
+        """, (id_paciente,))
+
+        # 5. Eliminar citas del paciente
+        cursor.execute("""
+            DELETE FROM citas
+            WHERE id_paciente = %s
+        """, (id_paciente,))
+
+        # 6. Eliminar paciente
+        cursor.execute("""
+            DELETE FROM pacientes
+            WHERE id_paciente = %s
+        """, (id_paciente,))
+
+        conexion.commit()
+        return True
+
+    except Exception as e:
+        conexion.rollback()
+        print("Error al eliminar expediente:", e)
+        return False
+
+    finally:
+        cursor.close()
+        conexion.close()
+
+
+def medico_tiene_acceso_expediente(id_doctor, id_paciente):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+
+    sql = """
+        SELECT 1
+        FROM citas
+        WHERE id_doctor = %s
+          AND id_paciente = %s
+        LIMIT 1
+    """
+    cursor.execute(sql, (id_doctor, id_paciente))
+    resultado = cursor.fetchone()
+
+    cursor.close()
+    conexion.close()
+
+    return resultado is not None
+
+
+def obtener_usuario_medico(id_usuario):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+
+    sql = """
+        SELECT id_usuario, correo, contrasena, rol, id_doctor, activo
+        FROM usuarios
+        WHERE id_usuario = %s
+        LIMIT 1
+    """
+    cursor.execute(sql, (id_usuario,))
+    usuario = cursor.fetchone()
+
+    cursor.close()
+    conexion.close()
+
+    return usuario    

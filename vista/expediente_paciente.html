@@ -3,7 +3,585 @@
 <head>
     <meta charset="UTF-8">
     <title>Expediente del Paciente | Clínica San Lucas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body{
+            background:#eef4fb;
+            font-family:'Inter',sans-serif;
+            color:#243447;
+            margin:0;
+        }
+
+        header{
+            background:linear-gradient(135deg,#3f8cf0,#2f78da);
+            padding:22px 34px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            box-shadow:0 8px 24px rgba(26,87,173,.16);
+        }
+
+        .logo_clinica img{
+            height:52px;
+            object-fit:contain;
+        }
+
+        header nav{
+            display:flex;
+            gap:18px;
+            align-items:center;
+        }
+
+        header nav a{
+            color:#fff;
+            text-decoration:none;
+            font-weight:700;
+            font-size:.96rem;
+        }
+
+        .expediente-page{
+            max-width:1320px;
+            margin:38px auto;
+            padding:0 20px 40px;
+        }
+
+        .expediente-hero{
+            background:linear-gradient(135deg,#ffffff 0%, #f7fbff 100%);
+            border-radius:30px;
+            padding:28px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:20px;
+            box-shadow:0 12px 35px rgba(31,76,148,.08);
+            border:1px solid rgba(52,117,212,.10);
+            margin-bottom:24px;
+        }
+
+        .hero-left{
+            display:flex;
+            align-items:center;
+            gap:18px;
+        }
+
+        .patient-avatar{
+            width:82px;
+            height:82px;
+            border-radius:24px;
+            background:linear-gradient(135deg,#2563eb,#60a5fa);
+            color:#fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:1.45rem;
+            font-weight:800;
+            box-shadow:0 10px 24px rgba(37,99,235,.22);
+            flex-shrink:0;
+        }
+
+        .expediente-title{
+            margin:0;
+            font-size:2rem;
+            font-weight:800;
+            color:#1d4f91;
+        }
+
+        .expediente-subtitle{
+            margin-top:6px;
+            font-size:1.08rem;
+            color:#475569;
+            font-weight:600;
+        }
+
+        .hero-pills{
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            margin-top:14px;
+        }
+
+        .hero-pill{
+            background:#ebf3ff;
+            color:#245fb3;
+            border:1px solid #d4e4ff;
+            border-radius:999px;
+            padding:8px 14px;
+            font-size:.9rem;
+            font-weight:700;
+        }
+
+        .expediente-layout{
+            display:grid;
+            grid-template-columns:2.1fr .9fr;
+            gap:24px;
+            align-items:start;
+        }
+
+        .main-column section,
+        .side-card{
+            background:#fff;
+            border-radius:24px;
+            padding:24px;
+            box-shadow:0 12px 32px rgba(31,76,148,.07);
+            border:1px solid rgba(45,95,168,.08);
+        }
+
+        .main-column section{
+            margin-bottom:22px;
+        }
+
+        .section-head{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:16px;
+            margin-bottom:18px;
+        }
+
+        .section-head h2{
+            margin:0;
+            font-size:1.28rem;
+            color:#1d4f91;
+            font-weight:800;
+        }
+
+        .section-badge{
+            background:#eef5ff;
+            color:#2563eb;
+            border-radius:999px;
+            padding:8px 14px;
+            font-size:.84rem;
+            font-weight:700;
+        }
+
+        .info-grid{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:16px;
+        }
+
+        .info-card,
+        .metric-card,
+        .note-card,
+        .consulta-box{
+            background:#f8fbff;
+            border:1px solid #dceafe;
+            border-radius:18px;
+            padding:18px;
+        }
+
+        .full{
+            grid-column:1/-1;
+        }
+
+        .info-label,
+        .metric-label{
+            display:block;
+            color:#64748b;
+            font-size:.86rem;
+            font-weight:700;
+            margin-bottom:6px;
+        }
+
+        .info-value{
+            color:#27374a;
+            font-weight:600;
+            line-height:1.6;
+        }
+
+        .metrics-grid{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:16px;
+            margin-bottom:16px;
+        }
+
+        .metric-card{
+            display:flex;
+            align-items:center;
+            gap:14px;
+        }
+
+        .metric-icon{
+            width:48px;
+            height:48px;
+            border-radius:14px;
+            background:#eaf2ff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:1.3rem;
+            flex-shrink:0;
+        }
+
+        .metric-value{
+            font-size:1.05rem;
+            font-weight:800;
+            color:#1f2d3d;
+        }
+
+        .notes-grid{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:16px;
+        }
+
+        .note-card h4,
+        .consulta-box h4{
+            margin:0 0 8px 0;
+            color:#1d4f91;
+            font-size:1rem;
+        }
+
+        .note-card p,
+        .consulta-box p{
+            margin:0;
+            color:#4b5563;
+            line-height:1.6;
+        }
+
+        .timeline{
+            display:flex;
+            flex-direction:column;
+            gap:18px;
+        }
+
+        .consulta-card{
+            position:relative;
+            background:#fff;
+            border:1px solid #e5eefb;
+            border-radius:24px;
+            box-shadow:0 10px 24px rgba(26,54,93,.06);
+            padding:22px;
+            overflow:hidden;
+        }
+
+        .consulta-card::before{
+            content:"";
+            position:absolute;
+            top:0;
+            left:0;
+            bottom:0;
+            width:6px;
+            background:#94a3b8;
+        }
+
+        .consulta-nutricion::before,
+        .consulta-nutriologia::before{ background:#27ae60; }
+
+        .consulta-dermatologia::before{ background:#f2994a; }
+        .consulta-obstetricia::before{ background:#9b51e0; }
+        .consulta-psicologia::before{ background:#2f80ed; }
+
+        .consulta-top{
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            gap:14px;
+            margin-bottom:16px;
+        }
+
+        .consulta-top h3{
+            margin:0;
+            font-size:1.15rem;
+            color:#1f3f73;
+            font-weight:800;
+        }
+
+        .folio-exp{
+            display:inline-block;
+            margin-top:6px;
+            color:#64748b;
+            font-size:.85rem;
+            font-weight:600;
+        }
+
+        .chip-especialidad{
+            padding:8px 14px;
+            border-radius:999px;
+            font-size:.85rem;
+            font-weight:700;
+            white-space:nowrap;
+            background:#eef4ff;
+            color:#255fb3;
+        }
+
+        .consulta-grid{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:12px 20px;
+            margin-bottom:16px;
+            color:#3f4e61;
+        }
+
+        .consulta-grid div{
+            background:#f8fbff;
+            border:1px solid #e1ecff;
+            border-radius:16px;
+            padding:13px 15px;
+        }
+
+        .consulta-body{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:16px;
+            margin-bottom:14px;
+        }
+
+        .detalle-especialidad{
+            margin-top:8px;
+            border-radius:16px;
+            border:1px solid #dbeafe;
+            background:#f9fbff;
+            overflow:hidden;
+        }
+
+        .detalle-especialidad summary{
+            cursor:pointer;
+            list-style:none;
+            padding:16px 18px;
+            font-weight:700;
+            color:#1d4f91;
+            background:#eef5ff;
+            border-bottom:1px solid #dbeafe;
+        }
+
+        .detalle-especialidad summary::-webkit-details-marker{
+            display:none;
+        }
+
+        .detalle-especialidad-content{
+            padding:18px;
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:14px 16px;
+        }
+
+        .detalle-item{
+            background:#fff;
+            border:1px solid #e5eefb;
+            border-radius:14px;
+            padding:12px 14px;
+        }
+
+        .detalle-item.full{
+            grid-column:1/-1;
+        }
+
+        .detalle-item span{
+            display:block;
+            color:#64748b;
+            font-size:.84rem;
+            font-weight:700;
+            margin-bottom:4px;
+        }
+
+        .detalle-item strong{
+            color:#334155;
+            font-weight:600;
+        }
+
+        .side-card{
+            position:sticky;
+            top:24px;
+            margin-bottom:18px;
+        }
+
+        .side-card h3{
+            margin:0 0 16px 0;
+            color:#1d4f91;
+            font-size:1.08rem;
+            font-weight:800;
+        }
+
+        .quick-list{
+            list-style:none;
+            padding:0;
+            margin:0;
+        }
+
+        .quick-list li{
+            display:flex;
+            justify-content:space-between;
+            gap:12px;
+            padding:12px 0;
+            border-bottom:1px solid #edf2f7;
+        }
+
+        .quick-list li:last-child{
+            border-bottom:none;
+        }
+
+        .quick-list span{
+            color:#64748b;
+            font-weight:700;
+        }
+
+        .quick-list strong{
+            color:#1f2d3d;
+            text-align:right;
+        }
+
+        .tag-group{
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+        }
+
+        .health-tag{
+            background:#eaf7ee;
+            color:#1b7d48;
+            padding:8px 12px;
+            border-radius:999px;
+            font-size:.88rem;
+            font-weight:700;
+        }
+
+        .empty-state{
+            text-align:center;
+            padding:40px 20px;
+            background:#f8fbff;
+            border:1px dashed #c8daff;
+            border-radius:20px;
+        }
+
+        .empty-state h3{
+            margin:10px 0 8px;
+            color:#1d4f91;
+        }
+
+        .empty-state p{
+            margin:0;
+            color:#64748b;
+        }
+
+        @media (max-width: 992px){
+            .expediente-layout{
+                grid-template-columns:1fr;
+            }
+
+            .expediente-hero{
+                flex-direction:column;
+                align-items:flex-start;
+            }
+
+            .info-grid,
+            .metrics-grid,
+            .notes-grid,
+            .consulta-grid,
+            .consulta-body,
+            .detalle-especialidad-content{
+                grid-template-columns:1fr;
+            }
+
+            .side-card{
+                position:static;
+            }
+        }
+        .consultas-grid{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(280px, 1fr));
+    gap:18px;
+}
+
+.consulta-card-mini{
+    padding:18px;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+}
+
+.consulta-mini-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-bottom:14px;
+}
+
+.mini-item{
+    background:#f8fbff;
+    border:1px solid #dceafe;
+    border-radius:14px;
+    padding:12px 14px;
+}
+
+.mini-item.full{
+    grid-column:1/-1;
+}
+
+.mini-item span{
+    display:block;
+    font-size:.82rem;
+    color:#64748b;
+    font-weight:700;
+    margin-bottom:4px;
+}
+
+.mini-item strong{
+    color:#334155;
+    font-weight:600;
+}
+
+.consulta-preview{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px;
+    margin-bottom:12px;
+}
+
+.preview-box{
+    background:#f8fbff;
+    border:1px solid #dceafe;
+    border-radius:14px;
+    padding:12px 14px;
+}
+
+.preview-box span{
+    display:block;
+    font-size:.82rem;
+    color:#1d4f91;
+    font-weight:800;
+    margin-bottom:6px;
+}
+
+.preview-box p{
+    margin:0;
+    color:#64748b;
+    line-height:1.5;
+    font-size:.92rem;
+}
+
+.detalle-consulta{
+    margin-top:auto;
+}
+
+.detalle-consulta summary{
+    text-align:center;
+    font-size:.92rem;
+}
+
+@media (max-width: 1200px){
+    .consultas-grid{
+        grid-template-columns:repeat(2, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 768px){
+    .consultas-grid{
+        grid-template-columns:1fr;
+    }
+
+    .consulta-mini-grid{
+        grid-template-columns:1fr;
+    }
+}
+    </style>
 </head>
 <body>
 
@@ -18,122 +596,306 @@
     </nav>
 </header>
 
-<section class="panel-citas-seccion">
-    <div class="panel-citas-contenedor">
-        <h2>Expediente Clínico del Paciente</h2>
+<div class="expediente-page">
 
-        {% if paciente %}
-        <div class="resumen-doctor">
-            <h3>Ficha clínica general</h3>
-            <p><strong>Expediente:</strong> {{ paciente.numero_expediente }}</p>
-            <p><strong>Nombre:</strong> {{ paciente.nombre }} {{ paciente.apellido_paterno }} {{ paciente.apellido_materno }}</p>
-            <p><strong>Sexo:</strong> {{ paciente.sexo }}</p>
-            <p><strong>Teléfono:</strong> {{ paciente.telefono }}</p>
-            <p><strong>Correo:</strong> {{ paciente.correo }}</p>
-            <p><strong>Dirección:</strong> {{ paciente.calle }} #{{ paciente.numero }}, Col. {{ paciente.colonia }}, C.P. {{ paciente.cp }}</p>
-            <hr class="separador-expediente">
-            <div class="grid-expediente">
-                <div><strong>Peso actual:</strong> {{ paciente.peso if paciente.peso else 'N/A' }}</div>
-                <div><strong>Talla actual:</strong> {{ paciente.talla if paciente.talla else 'N/A' }}</div>
-                <div><strong>Presión arterial:</strong> {{ paciente.presion_arterial if paciente.presion_arterial else 'N/A' }}</div>
-                <div><strong>Temperatura:</strong> {{ paciente.temperatura if paciente.temperatura else 'N/A' }}</div>
-                <div><strong>Tipo de sangre:</strong> {{ paciente.sangre if paciente.sangre else 'N/A' }}</div>
+    {% if paciente %}
+    <div class="expediente-hero">
+        <div class="hero-left">
+            <div class="patient-avatar">
+                {{ paciente.nombre[0] }}{{ paciente.apellido_paterno[0] }}
             </div>
-            <p><strong>Alergias:</strong> {{ paciente.alergias if paciente.alergias else 'Sin registro' }}</p>
-            <p><strong>Medicamentos actuales:</strong> {{ paciente.medicamentos_actuales if paciente.medicamentos_actuales else 'Sin registro' }}</p>
-            <p><strong>Antecedentes:</strong> {{ paciente.antecedentes if paciente.antecedentes else 'Sin registro' }}</p>
-        </div>
-        {% endif %}
 
-        <h3 style="color:#1d5fa8; margin-bottom:20px;">Historial de consultas</h3>
-
-        {% if historial %}
-            {% for consulta in historial %}
-            <div class="bloque-expediente">
-                <div class="bloque-expediente-header">
-                    <h3>Consulta {{ loop.index }}</h3>
-                    <span class="folio-expediente">{{ consulta.folio if consulta.folio else 'Sin folio' }}</span>
+            <div>
+                <h1 class="expediente-title">Expediente Clínico</h1>
+                <div class="expediente-subtitle">
+                    {{ paciente.nombre }} {{ paciente.apellido_paterno }} {{ paciente.apellido_materno }}
                 </div>
 
-                <div class="grid-expediente">
-                    <div><strong>Fecha:</strong> {{ consulta.fecha if consulta.fecha else 'Sin fecha' }}</div>
-                    <div><strong>Hora:</strong> {{ consulta.hora if consulta.hora else 'Sin hora' }}</div>
-                    <div>
-                        <strong>Médico:</strong>
-                        {% if consulta.especialidad == "Psicología" %}
-                            Lic.
-                        {% elif consulta.doctor_nombre == "Andrea" or consulta.doctor_nombre == "Laura" %}
-                            Dra.
-                        {% else %}
-                            Dr.
-                        {% endif %}
-                        {{ consulta.doctor_nombre }} {{ consulta.doctor_apellido_paterno }}
-                    </div>
-                    <div><strong>Especialidad:</strong> {{ consulta.especialidad if consulta.especialidad else 'Sin especialidad' }}</div>
-                    <div class="expediente-col-span"><strong>Motivo:</strong> {{ consulta.motivo if consulta.motivo else 'Sin motivo' }}</div>
-                    <div class="expediente-col-span"><strong>Diagnóstico:</strong> {{ consulta.diagnostico if consulta.diagnostico else 'Sin registro' }}</div>
-                    <div class="expediente-col-span"><strong>Tratamiento:</strong> {{ consulta.tratamiento if consulta.tratamiento else 'Sin registro' }}</div>
-                    <div class="expediente-col-span"><strong>Observaciones:</strong> {{ consulta.observaciones if consulta.observaciones else 'Sin registro' }}</div>
+                <div class="hero-pills">
+                    <span class="hero-pill">Expediente: {{ paciente.numero_expediente }}</span>
+                    <span class="hero-pill">Sexo: {{ paciente.sexo }}</span>
+                    <span class="hero-pill">Sangre: {{ paciente.sangre if paciente.sangre else 'N/A' }}</span>
                 </div>
-
-                {% if consulta.especialidad == "Obstetricia" %}
-                <hr class="separador-expediente">
-                <div class="bloque-texto-expediente">
-                    <p><strong>Semanas de gestación:</strong> {{ consulta.semanas_gestacion if consulta.semanas_gestacion else 'N/A' }}</p>
-                    <p><strong>FUM:</strong> {{ consulta.fum if consulta.fum else 'N/A' }}</p>
-                    <p><strong>Gestas:</strong> {{ consulta.gestas if consulta.gestas else 'N/A' }}</p>
-                    <p><strong>Partos:</strong> {{ consulta.partos if consulta.partos else 'N/A' }}</p>
-                    <p><strong>Cesáreas:</strong> {{ consulta.cesareas if consulta.cesareas else 'N/A' }}</p>
-                    <p><strong>Abortos:</strong> {{ consulta.abortos if consulta.abortos else 'N/A' }}</p>
-                    <p><strong>Frecuencia cardíaca fetal:</strong> {{ consulta.frecuencia_cardiaca_fetal if consulta.frecuencia_cardiaca_fetal else 'N/A' }}</p>
-                    <p><strong>Movimientos fetales:</strong> {{ consulta.movimientos_fetales if consulta.movimientos_fetales else 'N/A' }}</p>
-                    <p><strong>Observaciones obstétricas:</strong> {{ consulta.observaciones_obstetricia if consulta.observaciones_obstetricia else 'N/A' }}</p>
-                </div>
-                {% endif %}
-
-                {% if consulta.especialidad == "Dermatología" %}
-                <hr class="separador-expediente">
-                <div class="bloque-texto-expediente">
-                    <p><strong>Tipo de lesión:</strong> {{ consulta.tipo_lesion if consulta.tipo_lesion else 'N/A' }}</p>
-                    <p><strong>Ubicación de la lesión:</strong> {{ consulta.ubicacion_lesion if consulta.ubicacion_lesion else 'N/A' }}</p>
-                    <p><strong>Tiempo de evolución:</strong> {{ consulta.tiempo_evolucion if consulta.tiempo_evolucion else 'N/A' }}</p>
-                    <p><strong>Síntomas asociados:</strong> {{ consulta.sintomas_asociados if consulta.sintomas_asociados else 'N/A' }}</p>
-                    <p><strong>Tratamiento tópico:</strong> {{ consulta.tratamiento_topico if consulta.tratamiento_topico else 'N/A' }}</p>
-                    <p><strong>Observaciones dermatológicas:</strong> {{ consulta.observaciones_dermatologia if consulta.observaciones_dermatologia else 'N/A' }}</p>
-                </div>
-                {% endif %}
-
-                {% if consulta.especialidad == "Nutrición" %}
-                <hr class="separador-expediente">
-                <div class="bloque-texto-expediente">
-                    <p><strong>IMC:</strong> {{ consulta.imc if consulta.imc else 'N/A' }}</p>
-                    <p><strong>Hábitos alimenticios:</strong> {{ consulta.habitos_alimenticios if consulta.habitos_alimenticios else 'N/A' }}</p>
-                    <p><strong>Consumo de agua:</strong> {{ consulta.consumo_agua if consulta.consumo_agua else 'N/A' }}</p>
-                    <p><strong>Objetivo nutricional:</strong> {{ consulta.objetivo_nutricional if consulta.objetivo_nutricional else 'N/A' }}</p>
-                    <p><strong>Plan alimenticio:</strong> {{ consulta.plan_alimenticio if consulta.plan_alimenticio else 'N/A' }}</p>
-                    <p><strong>Observaciones nutricionales:</strong> {{ consulta.observaciones_nutricion if consulta.observaciones_nutricion else 'N/A' }}</p>
-                </div>
-                {% endif %}
-
-                {% if consulta.especialidad == "Psicología" %}
-                <hr class="separador-expediente">
-                <div class="bloque-texto-expediente">
-                    <p><strong>Motivo psicológico:</strong> {{ consulta.motivo_psicologico if consulta.motivo_psicologico else 'N/A' }}</p>
-                    <p><strong>Estado emocional:</strong> {{ consulta.estado_emocional if consulta.estado_emocional else 'N/A' }}</p>
-                    <p><strong>Evaluación mental:</strong> {{ consulta.evaluacion_mental if consulta.evaluacion_mental else 'N/A' }}</p>
-                    <p><strong>Plan terapéutico:</strong> {{ consulta.plan_terapeutico if consulta.plan_terapeutico else 'N/A' }}</p>
-                    <p><strong>Observaciones psicológicas:</strong> {{ consulta.observaciones_psicologia if consulta.observaciones_psicologia else 'N/A' }}</p>
-                </div>
-                {% endif %}
             </div>
-            {% endfor %}
-        {% else %}
-        <div class="mensaje-exito">
-            Este paciente aún no tiene consultas registradas en su expediente.
         </div>
-        {% endif %}
     </div>
+    {% endif %}
+
+    <div class="expediente-layout">
+
+        <div class="main-column">
+
+            {% if paciente %}
+            <section>
+                <div class="section-head">
+                    <h2>Ficha general del paciente</h2>
+                    <span class="section-badge">Resumen clínico</span>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <span class="info-label">Correo</span>
+                        <div class="info-value">{{ paciente.correo }}</div>
+                    </div>
+
+                    <div class="info-card">
+                        <span class="info-label">Teléfono</span>
+                        <div class="info-value">{{ paciente.telefono }}</div>
+                    </div>
+
+                    <div class="info-card full">
+                        <span class="info-label">Dirección</span>
+                        <div class="info-value">
+                            {{ paciente.calle }} #{{ paciente.numero }}, Col. {{ paciente.colonia }}, C.P. {{ paciente.cp }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="section-head">
+                    <h2>Signos vitales y antecedentes</h2>
+                    <span class="section-badge">Datos de salud</span>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">⚖️</div>
+                        <div>
+                            <span class="metric-label">Peso actual</span>
+                            <div class="metric-value">{{ paciente.peso if paciente.peso else 'N/A' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">📏</div>
+                        <div>
+                            <span class="metric-label">Talla actual</span>
+                            <div class="metric-value">{{ paciente.talla if paciente.talla else 'N/A' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">🩺</div>
+                        <div>
+                            <span class="metric-label">Presión arterial</span>
+                            <div class="metric-value">{{ paciente.presion_arterial if paciente.presion_arterial else 'N/A' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">🌡️</div>
+                        <div>
+                            <span class="metric-label">Temperatura</span>
+                            <div class="metric-value">{{ paciente.temperatura if paciente.temperatura else 'N/A' }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="notes-grid">
+                    <div class="note-card">
+                        <h4>Alergias</h4>
+                        <p>{{ paciente.alergias if paciente.alergias else 'Sin registro' }}</p>
+                    </div>
+
+                    <div class="note-card">
+                        <h4>Medicamentos actuales</h4>
+                        <p>{{ paciente.medicamentos_actuales if paciente.medicamentos_actuales else 'Sin registro' }}</p>
+                    </div>
+
+                    <div class="note-card full">
+                        <h4>Antecedentes</h4>
+                        <p>{{ paciente.antecedentes if paciente.antecedentes else 'Sin registro' }}</p>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+<section>
+    <div class="section-head">
+        <h2>Historial de consultas</h2>
+        <span class="section-badge">{{ historial|length if historial else 0 }} registro(s)</span>
+    </div>
+
+    {% if historial %}
+<div class="consultas-grid">
+    {% for consulta in historial %}
+
+        {% if consulta.especialidad == "Nutrición" or consulta.especialidad == "Nutriología" %}
+            {% set clase_consulta = "consulta-nutricion" %}
+        {% elif consulta.especialidad == "Dermatología" %}
+            {% set clase_consulta = "consulta-dermatologia" %}
+        {% elif consulta.especialidad == "Obstetricia" %}
+            {% set clase_consulta = "consulta-obstetricia" %}
+        {% elif consulta.especialidad == "Psicología" %}
+            {% set clase_consulta = "consulta-psicologia" %}
+        {% else %}
+            {% set clase_consulta = "" %}
+        {% endif %}
+
+        {% if consulta.especialidad == "Psicología" %}
+            {% set prefijo = "Lic." %}
+        {% elif consulta.doctor_nombre == "Andrea" or consulta.doctor_nombre == "Laura" %}
+            {% set prefijo = "Dra." %}
+        {% else %}
+            {% set prefijo = "Dr." %}
+        {% endif %}
+
+        <article class="consulta-card consulta-card-mini {{ clase_consulta }}">
+            <div class="consulta-top">
+                <div>
+                    <h3>Consulta {{ loop.index }}</h3>
+                    <span class="folio-exp">{{ consulta.folio if consulta.folio else 'Sin folio' }}</span>
+                </div>
+
+                <span class="chip-especialidad">
+                    {{ consulta.especialidad if consulta.especialidad else 'Sin especialidad' }}
+                </span>
+            </div>
+
+            <div class="consulta-mini-grid">
+                <div class="mini-item">
+                    <span>Fecha</span>
+                    <strong>{{ consulta.fecha if consulta.fecha else 'Sin fecha' }}</strong>
+                </div>
+
+                <div class="mini-item">
+                    <span>Hora</span>
+                    <strong>{{ consulta.hora if consulta.hora else 'Sin hora' }}</strong>
+                </div>
+
+                <div class="mini-item full">
+                    <span>Médico</span>
+                    <strong>{{ prefijo }} {{ consulta.doctor_nombre }} {{ consulta.doctor_apellido_paterno }}</strong>
+                </div>
+
+                <div class="mini-item full">
+                    <span>Motivo</span>
+                    <strong>{{ consulta.motivo if consulta.motivo else 'Sin motivo' }}</strong>
+                </div>
+            </div>
+
+            <div class="consulta-preview">
+                <div class="preview-box">
+                    <span>Diagnóstico</span>
+                    <p>
+                        {% if consulta.diagnostico %}
+                            {{ consulta.diagnostico[:90] }}{% if consulta.diagnostico|length > 90 %}...{% endif %}
+                        {% else %}
+                            Sin registro
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="preview-box">
+                    <span>Tratamiento</span>
+                    <p>
+                        {% if consulta.tratamiento %}
+                            {{ consulta.tratamiento[:90] }}{% if consulta.tratamiento|length > 90 %}...{% endif %}
+                        {% else %}
+                            Sin registro
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <details class="detalle-especialidad detalle-consulta">
+                <summary>Ver detalle completo</summary>
+
+                <div class="detalle-especialidad-content">
+                    <div class="detalle-item full">
+                        <span>Diagnóstico</span>
+                        <strong>{{ consulta.diagnostico if consulta.diagnostico else 'Sin registro' }}</strong>
+                    </div>
+
+                    <div class="detalle-item full">
+                        <span>Tratamiento</span>
+                        <strong>{{ consulta.tratamiento if consulta.tratamiento else 'Sin registro' }}</strong>
+                    </div>
+
+                    <div class="detalle-item full">
+                        <span>Observaciones generales</span>
+                        <strong>{{ consulta.observaciones if consulta.observaciones else 'Sin registro' }}</strong>
+                    </div>
+
+                    {% if consulta.especialidad == "Obstetricia" %}
+                        <div class="detalle-item"><span>Semanas de gestación</span><strong>{{ consulta.semanas_gestacion if consulta.semanas_gestacion else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>FUM</span><strong>{{ consulta.fum if consulta.fum else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Gestas</span><strong>{{ consulta.gestas if consulta.gestas else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Partos</span><strong>{{ consulta.partos if consulta.partos else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Cesáreas</span><strong>{{ consulta.cesareas if consulta.cesareas else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Abortos</span><strong>{{ consulta.abortos if consulta.abortos else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Frecuencia cardíaca fetal</span><strong>{{ consulta.frecuencia_cardiaca_fetal if consulta.frecuencia_cardiaca_fetal else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Movimientos fetales</span><strong>{{ consulta.movimientos_fetales if consulta.movimientos_fetales else 'N/A' }}</strong></div>
+                        <div class="detalle-item full"><span>Observaciones obstétricas</span><strong>{{ consulta.observaciones_obstetricia if consulta.observaciones_obstetricia else 'N/A' }}</strong></div>
+                    {% endif %}
+
+                    {% if consulta.especialidad == "Dermatología" %}
+                        <div class="detalle-item"><span>Tipo de lesión</span><strong>{{ consulta.tipo_lesion if consulta.tipo_lesion else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Ubicación de la lesión</span><strong>{{ consulta.ubicacion_lesion if consulta.ubicacion_lesion else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Tiempo de evolución</span><strong>{{ consulta.tiempo_evolucion if consulta.tiempo_evolucion else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Síntomas asociados</span><strong>{{ consulta.sintomas_asociados if consulta.sintomas_asociados else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Tratamiento tópico</span><strong>{{ consulta.tratamiento_topico if consulta.tratamiento_topico else 'N/A' }}</strong></div>
+                        <div class="detalle-item full"><span>Observaciones dermatológicas</span><strong>{{ consulta.observaciones_dermatologia if consulta.observaciones_dermatologia else 'N/A' }}</strong></div>
+                    {% endif %}
+
+                    {% if consulta.especialidad == "Nutrición" or consulta.especialidad == "Nutriología" %}
+                        <div class="detalle-item"><span>IMC</span><strong>{{ consulta.imc if consulta.imc else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Hábitos alimenticios</span><strong>{{ consulta.habitos_alimenticios if consulta.habitos_alimenticios else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Consumo de agua</span><strong>{{ consulta.consumo_agua if consulta.consumo_agua else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Objetivo nutricional</span><strong>{{ consulta.objetivo_nutricional if consulta.objetivo_nutricional else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Plan alimenticio</span><strong>{{ consulta.plan_alimenticio if consulta.plan_alimenticio else 'N/A' }}</strong></div>
+                        <div class="detalle-item full"><span>Observaciones nutricionales</span><strong>{{ consulta.observaciones_nutricion if consulta.observaciones_nutricion else 'N/A' }}</strong></div>
+                    {% endif %}
+
+                    {% if consulta.especialidad == "Psicología" %}
+                        <div class="detalle-item"><span>Motivo psicológico</span><strong>{{ consulta.motivo_psicologico if consulta.motivo_psicologico else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Estado emocional</span><strong>{{ consulta.estado_emocional if consulta.estado_emocional else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Evaluación mental</span><strong>{{ consulta.evaluacion_mental if consulta.evaluacion_mental else 'N/A' }}</strong></div>
+                        <div class="detalle-item"><span>Plan terapéutico</span><strong>{{ consulta.plan_terapeutico if consulta.plan_terapeutico else 'N/A' }}</strong></div>
+                        <div class="detalle-item full"><span>Observaciones psicológicas</span><strong>{{ consulta.observaciones_psicologia if consulta.observaciones_psicologia else 'N/A' }}</strong></div>
+                    {% endif %}
+                </div>
+            </details>
+        </article>
+    {% endfor %}
+
+{% else %}
+<div class="empty-state">
+    <h3>Sin historial clínico</h3>
+    <p>Este paciente aún no tiene consultas registradas en su expediente.</p>
+</div>
+{% endif %}
 </section>
+        </div>
+
+        <aside>
+            {% if paciente %}
+            <div class="side-card">
+                <h3>Datos rápidos</h3>
+                <ul class="quick-list">
+                    <li><span>Expediente</span><strong>{{ paciente.numero_expediente }}</strong></li>
+                    <li><span>Sexo</span><strong>{{ paciente.sexo }}</strong></li>
+                    <li><span>Tipo de sangre</span><strong>{{ paciente.sangre if paciente.sangre else 'N/A' }}</strong></li>
+                    <li><span>Teléfono</span><strong>{{ paciente.telefono }}</strong></li>
+                    <li><span>Correo</span><strong>{{ paciente.correo }}</strong></li>
+                </ul>
+            </div>
+
+            <div class="side-card">
+                <h3>Etiquetas clínicas</h3>
+                <div class="tag-group">
+                    <span class="health-tag">Paciente activo</span>
+                    <span class="health-tag">Historial disponible</span>
+                    <span class="health-tag">Seguimiento médico</span>
+                </div>
+            </div>
+            {% endif %}
+        </aside>
+
+    </div>
+</div>
+</div>
 
 </body>
 </html>

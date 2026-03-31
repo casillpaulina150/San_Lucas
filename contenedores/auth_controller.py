@@ -20,7 +20,7 @@ def login():
             session["nombre"] = usuario["correo"]
             session["id_usuario"] = usuario["id_usuario"]
             session["id_doctor"] = usuario["id_doctor"]
-
+        
             if usuario["rol"] == "medico":
                 return redirect(url_for("medico.dashboard"))
             else:

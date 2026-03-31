@@ -20,101 +20,163 @@
 </header>
 
 <section class="panel-citas-seccion">
-    <div class="panel-citas-contenedor">
-        <h2>Panel de Citas Registradas</h2>
-        <p class="subtitulo-formulario">
-            Consulta las citas por médico y filtra entre próximas, pasadas o del siguiente mes.
-        </p>
+    <div class="panel-citas-layout">
 
-        <form method="GET" action="{{ url_for('panel.panel_citas') }}" class="filtros-panel">
-            <div class="grupo-campo">
-                <label for="id_doctor">Médico</label>
-                <select name="id_doctor" id="id_doctor" required>
-                    <option value="">Selecciona un médico</option>
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="panel-citas-contenedor">
+            <h2>Panel de Citas Registradas</h2>
+            <p class="subtitulo-formulario">
+                Consulta las citas por médico y filtra entre próximas, pasadas o del siguiente mes.
+            </p>
+
+            <form method="GET" action="{{ url_for('panel.panel_citas') }}" class="filtros-panel">
+                <div class="grupo-campo">
+                    <label for="id_doctor">Médico</label>
+                    <select name="id_doctor" id="id_doctor" required>
+                        <option value="">Selecciona un médico</option>
+                        {% for doc in doctores %}
+                            {% if doc.especialidad == "Psicología" %}
+                                {% set prefijo = "Lic." %}
+                            {% elif doc.nombre == "Andrea" or doc.nombre == "Laura" %}
+                                {% set prefijo = "Dra." %}
+                            {% else %}
+                                {% set prefijo = "Dr." %}
+                            {% endif %}
+
+                            <option value="{{ doc.id_doctor }}" {% if id_doctor|string == doc.id_doctor|string %}selected{% endif %}>
+                                {{ prefijo }} {{ doc.nombre }} {{ doc.apellido_paterno }} - {{ doc.especialidad }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="filtro">Filtro</label>
+                    <select name="filtro" id="filtro">
+                        <option value="proximas" {% if filtro == "proximas" %}selected{% endif %}>Próximas</option>
+                        <option value="pasadas" {% if filtro == "pasadas" %}selected{% endif %}>Pasadas</option>
+                        <option value="siguiente_mes" {% if filtro == "siguiente_mes" %}selected{% endif %}>Siguiente mes</option>
+                        <option value="todas" {% if filtro == "todas" %}selected{% endif %}>Todas</option>
+                    </select>
+                </div>
+
+                <div class="grupo-campo grupo-campo-boton">
+                    <button type="submit" class="btn-enviar-cita">Consultar</button>
+                </div>
+            </form>
+
+            {% if doctor_seleccionado %}
+            <div class="resumen-doctor">
+                <h3>
+                    Citas de
+                    {% if doctor_seleccionado.especialidad == "Psicología" %}
+                        Lic.
+                    {% elif doctor_seleccionado.nombre == "Andrea" or doctor_seleccionado.nombre == "Laura" %}
+                        Dra.
+                    {% else %}
+                        Dr.
+                    {% endif %}
+                    {{ doctor_seleccionado.nombre }} {{ doctor_seleccionado.apellido_paterno }}
+                </h3>
+                <p>Especialidad: {{ doctor_seleccionado.especialidad }}</p>
+            </div>
+            {% endif %}
+
+            {% if citas %}
+            <div class="tabla-citas-contenedor">
+                <table class="tabla-citas">
+                    <thead>
+                        <tr>
+                            <th>Folio</th>
+                            <th>Expediente</th>
+                            <th>Paciente</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Teléfono</th>
+                            <th>Correo</th>
+                            <th>Motivo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cita in citas %}
+                        <tr>
+                            <td>{{ cita.folio }}</td>
+                            <td>{{ cita.numero_expediente }}</td>
+                            <td>{{ cita.nombre }} {{ cita.apellido_paterno }} {{ cita.apellido_materno }}</td>
+                            <td>{{ cita.fecha }}</td>
+                            <td>{{ cita.hora }}</td>
+                            <td>{{ cita.telefono }}</td>
+                            <td>{{ cita.correo }}</td>
+                            <td>{{ cita.motivo }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% elif id_doctor %}
+            <div class="mensaje-exito">
+                No se encontraron citas para ese médico con el filtro seleccionado.
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- TARJETA LATERAL DE DOCTORES -->
+        <aside class="panel-doctores-card">
+            <h3>Doctores</h3>
+
+            <div class="lista-doctores">
+                {% if doctores %}
                     {% for doc in doctores %}
                         {% if doc.especialidad == "Psicología" %}
                             {% set prefijo = "Lic." %}
-                        {% elif doc.nombre == "Andrea" or doc.nombre == "Laura" %}
-                            {% set prefijo = "Dra." %}
-                        {% else %}
+                            {% set clase_color = "color-psicologia" %}
+                        {% elif doc.especialidad == "Obstetricia" %}
+                            {% if doc.nombre == "Andrea" or doc.nombre == "Laura" %}
+                                {% set prefijo = "Dra." %}
+                            {% else %}
+                                {% set prefijo = "Dr." %}
+                            {% endif %}
+                            {% set clase_color = "color-obstetricia" %}
+                        {% elif doc.especialidad == "Dermatología" %}
+                            {% if doc.nombre == "Andrea" or doc.nombre == "Laura" %}
+                                {% set prefijo = "Dra." %}
+                            {% else %}
+                                {% set prefijo = "Dr." %}
+                            {% endif %}
+                            {% set clase_color = "color-dermatologia" %}
+                        {% elif doc.especialidad == "Nutriología" %}
                             {% set prefijo = "Dr." %}
+                            {% set clase_color = "color-nutriologia" %}
+                        {% else %}
+                            {% if doc.nombre == "Andrea" or doc.nombre == "Laura" %}
+                                {% set prefijo = "Dra." %}
+                            {% else %}
+                                {% set prefijo = "Dr." %}
+                            {% endif %}
+                            {% set clase_color = "color-default" %}
                         {% endif %}
 
-                        <option value="{{ doc.id_doctor }}" {% if id_doctor == doc.id_doctor %}selected{% endif %}>
-                            {{ prefijo }} {{ doc.nombre }} {{ doc.apellido_paterno }} - {{ doc.especialidad }}
-                        </option>
+                        <div class="doctor-item">
+                            <span class="doctor-color {{ clase_color }}"></span>
+                            <span>{{ prefijo }} {{ doc.nombre }} {{ doc.apellido_paterno }} — {{ doc.especialidad }}</span>
+                        </div>
                     {% endfor %}
-                </select>
-            </div>
-
-            <div class="grupo-campo">
-                <label for="filtro">Filtro</label>
-                <select name="filtro" id="filtro">
-                    <option value="proximas" {% if filtro == "proximas" %}selected{% endif %}>Próximas</option>
-                    <option value="pasadas" {% if filtro == "pasadas" %}selected{% endif %}>Pasadas</option>
-                    <option value="siguiente_mes" {% if filtro == "siguiente_mes" %}selected{% endif %}>Siguiente mes</option>
-                    <option value="todas" {% if filtro == "todas" %}selected{% endif %}>Todas</option>
-                </select>
-            </div>
-
-            <div class="grupo-campo grupo-campo-boton">
-                <button type="submit" class="btn-enviar-cita">Consultar</button>
-            </div>
-        </form>
-
-        {% if doctor_seleccionado %}
-        <div class="resumen-doctor">
-            <h3>
-                Citas de
-                {% if doctor_seleccionado.especialidad == "Psicología" %}
-                    Lic.
-                {% elif doctor_seleccionado.nombre == "Andrea" or doctor_seleccionado.nombre == "Laura" %}
-                    Dra.
                 {% else %}
-                    Dr.
+                    <p>No hay médicos registrados.</p>
                 {% endif %}
-                {{ doctor_seleccionado.nombre }} {{ doctor_seleccionado.apellido_paterno }}
-            </h3>
-            <p>Especialidad: {{ doctor_seleccionado.especialidad }}</p>
-        </div>
-        {% endif %}
+            </div>
 
-        {% if citas %}
-        <div class="tabla-citas-contenedor">
-            <table class="tabla-citas">
-                <thead>
-                    <tr>
-                        <th>Folio</th>
-                        <th>Expediente</th>
-                        <th>Paciente</th>
-                        <th>Fecha</th>
-                        <th>Hora</th>
-                        <th>Teléfono</th>
-                        <th>Correo</th>
-                        <th>Motivo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for cita in citas %}
-                    <tr>
-                        <td>{{ cita.folio }}</td>
-                        <td>{{ cita.numero_expediente }}</td>
-                        <td>{{ cita.nombre }} {{ cita.apellido_paterno }} {{ cita.apellido_materno }}</td>
-                        <td>{{ cita.fecha }}</td>
-                        <td>{{ cita.hora }}</td>
-                        <td>{{ cita.telefono }}</td>
-                        <td>{{ cita.correo }}</td>
-                        <td>{{ cita.motivo }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% elif id_doctor %}
-        <div class="mensaje-exito">
-            No se encontraron citas para ese médico con el filtro seleccionado.
-        </div>
-        {% endif %}
+            <hr>
+
+            <a href="{{ url_for('panel.panel_citas', filtro='todas') }}" class="btn-panel-secundario">
+                Ver todas las citas
+            </a>
+
+            <a href="{{ url_for('panel.panel_citas') }}" class="btn-panel-primario">
+                Ver solo mis citas
+            </a>
+        </aside>
+
     </div>
 </section>
 
