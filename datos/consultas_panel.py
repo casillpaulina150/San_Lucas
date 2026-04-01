@@ -209,3 +209,93 @@ def obtener_pacientes_panel_recepcion(busqueda=""):
     conexion.close()
 
     return resultados
+
+def obtener_paciente_por_id_panel(id_paciente):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+
+    query = """
+        SELECT
+            id_paciente,
+            nombre,
+            apellido_paterno,
+            apellido_materno,
+            correo,
+            numero_expediente
+        FROM pacientes
+        WHERE id_paciente = %s
+        LIMIT 1
+    """
+    cursor.execute(query, (id_paciente,))
+    paciente = cursor.fetchone()
+
+    cursor.close()
+    conexion.close()
+
+    return paciente
+
+
+def cuenta_paciente_existe(id_paciente):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+
+    query = """
+        SELECT id_cuenta_paciente
+        FROM cuentas_paciente
+        WHERE id_paciente = %s
+        LIMIT 1
+    """
+    cursor.execute(query, (id_paciente,))
+    cuenta = cursor.fetchone()
+
+    cursor.close()
+    conexion.close()
+
+    return cuenta is not None
+
+
+def usuario_paciente_existe(usuario):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+
+    query = """
+        SELECT id_cuenta_paciente
+        FROM cuentas_paciente
+        WHERE usuario = %s
+        LIMIT 1
+    """
+    cursor.execute(query, (usuario,))
+    cuenta = cursor.fetchone()
+
+    cursor.close()
+    conexion.close()
+
+    return cuenta is not None
+
+
+def crear_cuenta_paciente(id_paciente, usuario, contrasena_hash):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    try:
+        query = """
+            INSERT INTO cuentas_paciente (
+                id_paciente,
+                usuario,
+                contrasena,
+                activo,
+                debe_cambiar_password
+            ) VALUES (%s, %s, %s, 1, 1)
+        """
+        cursor.execute(query, (id_paciente, usuario, contrasena_hash))
+        conexion.commit()
+        return True
+
+    except Exception as e:
+        conexion.rollback()
+        print("Error al crear cuenta del paciente:", e)
+        return False
+
+    finally:
+        cursor.close()
+        conexion.close()

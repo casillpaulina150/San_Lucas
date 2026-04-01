@@ -5,6 +5,8 @@
     <title>Panel de recepción | Clínica San Lucas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -65,18 +67,21 @@
             padding:0 18px;
         }
 
-        .recepcion-layout{
-            display:grid;
-            grid-template-columns: 2.2fr .95fr;
-            gap:24px;
-            align-items:start;
-        }
+    .recepcion-layout{
+    display:grid;
+    grid-template-columns: minmax(0, 1fr) 350px;
+    gap:22px;
+    align-items:start;
+}
 
-        .recepcion-main{
-            display:flex;
-            flex-direction:column;
-            gap:22px;
-        }
+.recepcion-main{
+    min-width:0;
+}
+
+.side-column{
+    min-width:0;
+    width:100%;
+}
 
         .resumen-grid{
             display:grid;
@@ -240,31 +245,31 @@
             border-top:1px solid #edf3fb;
         }
 
-        table{
-            width:100%;
-            border-collapse:collapse;
-            min-width:980px;
-        }
+ .tabla-wrap .tabla-pacientes{
+    width:100%;
+    border-collapse:collapse;
+    min-width:980px;
+}
 
-        thead th{
-            background:#fafcff;
-            color:#637187;
-            text-align:left;
-            font-size:.96rem;
-            font-weight:800;
-            padding:18px 20px;
-            border-bottom:1px solid #e8eff8;
-        }
+.tabla-wrap .tabla-pacientes thead th{
+    background:#fafcff;
+    color:#637187;
+    text-align:left;
+    font-size:.96rem;
+    font-weight:800;
+    padding:18px 20px;
+    border-bottom:1px solid #e8eff8;
+}
 
-        tbody td{
-            padding:18px 20px;
-            border-bottom:1px solid #edf2f8;
-            vertical-align:middle;
-        }
+.tabla-wrap .tabla-pacientes tbody td{
+    padding:18px 20px;
+    border-bottom:1px solid #edf2f8;
+    vertical-align:middle;
+}
 
-        tbody tr:hover{
-            background:#f9fcff;
-        }
+.tabla-wrap .tabla-pacientes tbody tr:hover{
+    background:#f9fcff;
+}
 
         .expediente-cell{
             display:flex;
@@ -556,15 +561,19 @@
             color:#7a8798;
         }
 
-        @media (max-width: 1100px){
-            .recepcion-layout{
-                grid-template-columns:1fr;
-            }
+     @media (max-width: 1200px){
+    .recepcion-layout{
+        grid-template-columns:1fr;
+    }
 
-            .resumen-grid{
-                grid-template-columns:1fr;
-            }
-        }
+    .resumen-grid{
+        grid-template-columns:1fr;
+    }
+
+    .side-column{
+        max-width:420px;
+    }
+}
 
         @media (max-width: 768px){
             header{
@@ -588,6 +597,166 @@
                 min-width:100%;
             }
         }
+ .calendar-card{
+    padding:18px 16px 18px;
+    overflow:hidden;
+}
+
+#calendarRecepcion{
+    width:100%;
+    max-width:100%;
+}
+
+#calendarRecepcion .fc{
+    font-size:.82rem;
+}
+
+#calendarRecepcion .fc-toolbar{
+    margin-bottom:12px !important;
+}
+
+#calendarRecepcion .fc-toolbar-title{
+    font-size:1rem !important;
+    font-weight:800;
+    color:#4a5c75;
+    text-transform:lowercase;
+}
+
+#calendarRecepcion .fc-button{
+    background:transparent !important;
+    border:none !important;
+    color:#93a4bf !important;
+    box-shadow:none !important;
+    padding:2px 6px !important;
+    font-size:1rem !important;
+}
+
+#calendarRecepcion .fc-button:hover{
+    background:transparent !important;
+    color:#6b7b95 !important;
+}
+
+#calendarRecepcion .fc-scrollgrid,
+#calendarRecepcion .fc-theme-standard td,
+#calendarRecepcion .fc-theme-standard th{
+    border:none !important;
+}
+
+#calendarRecepcion .fc-scrollgrid-sync-table,
+#calendarRecepcion .fc-col-header table,
+#calendarRecepcion .fc-daygrid-body table{
+    width:100% !important;
+    table-layout:fixed !important;
+}
+
+#calendarRecepcion .fc-col-header-cell{
+    padding:4px 0 8px;
+}
+
+#calendarRecepcion .fc-col-header-cell-cushion{
+    color:#718198;
+    font-weight:700;
+    text-decoration:none;
+    font-size:.78rem !important;
+}
+
+#calendarRecepcion .fc-daygrid-day-number{
+    color:#55657d;
+    font-weight:700;
+    text-decoration:none;
+    padding:5px !important;
+    font-size:.82rem !important;
+}
+
+#calendarRecepcion .fc-daygrid-day-frame{
+    min-height:44px !important;
+}
+
+#calendarRecepcion .fc-daygrid-day.fc-day-today{
+    background:rgba(47,128,237,.08) !important;
+    border-radius:10px;
+}
+
+#calendarRecepcion .fc-daygrid-event{
+    background:transparent !important;
+    border:none !important;
+    padding:0 !important;
+    margin:1px 0 0 0 !important;
+}
+
+#calendarRecepcion .fc-event-main{
+    display:flex;
+    justify-content:center;
+}
+
+#calendarRecepcion .mini-event-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    display:inline-block;
+}
+
+#calendarRecepcion .fc-more-link{
+    color:#4a86e8;
+    font-weight:700;
+    text-decoration:none;
+    font-size:.68rem;
+}
+
+#calendarRecepcion .fc-view-harness,
+#calendarRecepcion .fc-daygrid-body,
+#calendarRecepcion .fc-scrollgrid-sync-table{
+    width:100% !important;
+    max-width:100% !important;
+}
+
+#calendarRecepcion .fc-scroller{
+    overflow:hidden !important;
+}
+
+#calendarRecepcion .fc-daygrid-day-events{
+    min-height:14px !important;
+}
+
+.calendar-btn{
+    width:100%;
+    margin-top:14px;
+    border:none;
+    border-radius:16px;
+    padding:13px 14px;
+    background:linear-gradient(135deg,#2f80ed,#356df5);
+    color:#fff;
+    font-size:.95rem;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.flash-container{
+    max-width:1320px;
+    margin:0 auto 18px;
+    padding:0 18px;
+}
+
+.flash-message{
+    border-radius:16px;
+    padding:14px 18px;
+    font-weight:600;
+    margin-bottom:10px;
+    box-shadow:0 10px 20px rgba(0,0,0,.04);
+}
+
+.flash-success{
+    background:#ecfdf3;
+    color:#15803d;
+    border:1px solid #bbf7d0;
+}
+
+.flash-error{
+    background:#fef2f2;
+    color:#b91c1c;
+    border:1px solid #fecaca;
+}
+
     </style>
 </head>
 <body>
@@ -605,6 +774,17 @@
 </header>
 
 <section class="recepcion-page">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-container">
+            {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
     <div class="recepcion-layout">
 
         <div class="recepcion-main">
@@ -659,7 +839,7 @@
                 </form>
 
                 <div class="tabla-wrap">
-                    <table>
+                    <table class="tabla-pacientes">
                         <thead>
                             <tr>
                                 <th>Expediente</th>
@@ -699,15 +879,25 @@
                                         <span class="categoria-text">{{ paciente.categoria }}</span>
                                     </td>
 
-                                    <td>
-                                        {% if paciente.estado_cuenta == 'Sin cuenta' %}
-                                            <button type="button" class="btn-accion btn-primary-soft">Activar cuenta</button>
-                                        {% elif paciente.estado_cuenta == 'Pendiente de cambio' %}
-                                            <button type="button" class="btn-accion btn-secondary-soft">Reenviar acceso</button>
-                                        {% else %}
-                                            <button type="button" class="btn-accion btn-secondary-soft">Ver cuenta</button>
-                                        {% endif %}
-                                    </td>
+                                  <td>
+    {% if paciente.estado_cuenta == 'Sin cuenta' %}
+        <form method="POST" action="{{ url_for('panel.activar_cuenta_paciente', id_paciente=paciente.id_paciente) }}">
+            <button type="submit" class="btn-accion btn-primary-soft">
+                Activar cuenta
+            </button>
+        </form>
+
+    {% elif paciente.estado_cuenta == 'Pendiente de cambio' %}
+        <button type="button" class="btn-accion btn-secondary-soft" disabled>
+            Pendiente de cambio
+        </button>
+
+    {% else %}
+        <button type="button" class="btn-accion btn-secondary-soft" disabled>
+            Cuenta activa
+        </button>
+    {% endif %}
+</td>
                                 </tr>
                                 {% endfor %}
 
@@ -780,78 +970,14 @@
         </div>
 
         <aside class="side-column">
-
+        
             <div class="calendar-card card-soft">
-                <div class="calendar-head">
-                    <button class="calendar-arrow" type="button">←</button>
-                    <h3>abril 2024</h3>
-                    <button class="calendar-arrow" type="button">→</button>
+                <div id="calendarRecepcion">
                 </div>
-
-                <div class="calendar-grid">
-                    <div class="calendar-day-name">L</div>
-                    <div class="calendar-day-name">M</div>
-                    <div class="calendar-day-name">M</div>
-                    <div class="calendar-day-name">J</div>
-                    <div class="calendar-day-name">V</div>
-                    <div class="calendar-day-name">S</div>
-                    <div class="calendar-day-name">D</div>
-
-                    <div class="calendar-day">1</div>
-                    <div class="calendar-day">2</div>
-                    <div class="calendar-day">3</div>
-                    <div class="calendar-day">4</div>
-                    <div class="calendar-day">5</div>
-                    <div class="calendar-day">6</div>
-                    <div class="calendar-day">7</div>
-
-                    <div class="calendar-day">8</div>
-                    <div class="calendar-day">9</div>
-                    <div class="calendar-day">10</div>
-                    <div class="calendar-day">11</div>
-                    <div class="calendar-day">12</div>
-                    <div class="calendar-day">13</div>
-                    <div class="calendar-day">14</div>
-
-                    <div class="calendar-day">15</div>
-                    <div class="calendar-day">16</div>
-                    <div class="calendar-day">17</div>
-                    <div class="calendar-day">18</div>
-                    <div class="calendar-day">19</div>
-                    <div class="calendar-day">20</div>
-                    <div class="calendar-day">21</div>
-
-                    <div class="calendar-day">22</div>
-                    <div class="calendar-day">23</div>
-                    <div class="calendar-day">24</div>
-                    <div class="calendar-day">25</div>
-                    <div class="calendar-day">26</div>
-                    <div class="calendar-day">27</div>
-                    <div class="calendar-day">28</div>
-
-                    <div class="calendar-day">29</div>
-                    <div class="calendar-day">30</div>
-                    <div class="calendar-day muted">31</div>
-                    <div class="calendar-day muted"></div>
-                    <div class="calendar-day muted"></div>
-                    <div class="calendar-day muted"></div>
-                    <div class="calendar-day muted"></div>
-                </div>
-
-                <div class="calendar-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span class="mini-dot mini-yellow"></span>
-                    <span class="mini-dot mini-purple"></span>
-                    <span class="mini-dot mini-cyan"></span>
-                    <span class="mini-dot mini-green"></span>
-                </div>
-
-                <button class="calendar-btn" type="button">Ver agenda completa</button>
+                <a href="{{ url_for('agenda_bp.agenda') }}" class="calendar-btn" style="display:block; text-align:center; text-decoration:none;">
+                 Ver agenda completa
+                </a>
             </div>
-
-            <aside class="panel-doctores-card card-soft">
                 <h3>Doctores</h3>
 
                 <div class="lista-doctores">
@@ -907,6 +1033,39 @@
 
     </div>
 </section>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('calendarRecepcion');
 
+    if (calendarEl) {
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'es',
+            initialView: 'dayGridMonth',
+            fixedWeekCount: false,
+            height: 'auto',
+            headerToolbar: {
+                left: 'prev',
+                center: 'title',
+                right: 'next'
+            },
+           dayMaxEvents: 3,
+            moreLinkClick: "popover",
+            displayEventTime: false,
+            events: "{{ url_for('panel.api_citas_calendario') }}",
+            eventContent: function(info) {
+                const color = info.event.backgroundColor || '#3b82f6';
+                return {
+                   html: `<span class="mini-event-dot" style="background:${color}"></span>`
+                      };
+                        },
+                        eventClick: function() {
+                         window.location.href = "{{ url_for('agenda_bp.agenda') }}";
+                        }
+        });
+
+        calendar.render();
+    }
+});
+</script>
 </body>
 </html>

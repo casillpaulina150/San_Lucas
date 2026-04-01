@@ -35,21 +35,30 @@ def obtener_siguiente_folio():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    sql = "SELECT COUNT(*) FROM citas"
+    sql = """
+        SELECT COALESCE(MAX(CAST(SUBSTRING(folio, 5) AS UNSIGNED)), 0)
+        FROM citas
+    """
     cursor.execute(sql)
-    total = cursor.fetchone()[0]
+    ultimo = cursor.fetchone()[0]
+    ultimo = int(ultimo or 0)
 
     cursor.close()
     conexion.close()
 
-    return f"CSL-{total + 1:04d}"
+    return f"CSL-{ultimo + 1:04d}"
 
 
 def obtener_siguiente_expediente(cursor):
-    sql = "SELECT COUNT(*) FROM pacientes"
+    sql = """
+        SELECT COALESCE(MAX(CAST(SUBSTRING(numero_expediente, 5) AS UNSIGNED)), 0)
+        FROM pacientes
+    """
     cursor.execute(sql)
-    total = cursor.fetchone()[0]
-    return f"EXP-{total + 1:04d}"
+    ultimo = cursor.fetchone()[0]
+    ultimo = int(ultimo or 0)
+
+    return f"EXP-{ultimo + 1:04d}"
 
 
 def obtener_o_crear_paciente(cursor, cita_info):
@@ -119,29 +128,35 @@ def guardar_paciente_y_cita(cita_info):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    id_paciente, numero_expediente = obtener_o_crear_paciente(cursor, cita_info)
-    cita_info["numero_expediente"] = numero_expediente
+    try:
+        id_paciente, numero_expediente = obtener_o_crear_paciente(cursor, cita_info)
+        cita_info["numero_expediente"] = numero_expediente
 
-    sql_cita = """
-        INSERT INTO citas (
-            folio, id_paciente, id_doctor, fecha, hora, motivo
-        ) VALUES (%s, %s, %s, %s, %s, %s)
-    """
+        sql_cita = """
+            INSERT INTO citas (
+                folio, id_paciente, id_doctor, fecha, hora, motivo
+            ) VALUES (%s, %s, %s, %s, %s, %s)
+        """
 
-    valores_cita = (
-        cita_info["folio"],
-        id_paciente,
-        cita_info["id_doctor"],
-        cita_info["fecha"],
-        cita_info["hora"],
-        cita_info["motivo"]
-    )
+        valores_cita = (
+            cita_info["folio"],
+            id_paciente,
+            cita_info["id_doctor"],
+            cita_info["fecha"],
+            cita_info["hora"],
+            cita_info["motivo"]
+        )
 
-    cursor.execute(sql_cita, valores_cita)
-    conexion.commit()
+        cursor.execute(sql_cita, valores_cita)
+        conexion.commit()
 
-    cursor.close()
-    conexion.close()
+    except Exception:
+        conexion.rollback()
+        raise
+
+    finally:
+        cursor.close()
+        conexion.close()
 
 
 def obtener_horas_ocupadas(id_doctor, fecha):
