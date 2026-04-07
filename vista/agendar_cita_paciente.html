@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agendar nueva cita | Clínica San Lucas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root{
+            --primary:#2f80ed;
+            --primary-dark:#1f6fe0;
+            --soft-bg:#eef4fb;
+            --card-bg:rgba(255,255,255,.90);
+            --text:#243447;
+            --muted:#6b7280;
+            --line:#dfe8f5;
+            --shadow:0 18px 38px rgba(31,76,148,.08);
+            --success-bg:#ecfdf3;
+            --success-text:#166534;
+            --success-line:#bbf7d0;
+            --error-bg:#fef2f2;
+            --error-text:#b91c1c;
+            --error-line:#fecaca;
+        }
+
+        *{
+            box-sizing:border-box;
+            font-family:'Inter',sans-serif;
+        }
+
+        body{
+            margin:0;
+            min-height:100vh;
+            color:var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(86,204,242,.14), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(47,128,237,.10), transparent 25%),
+                linear-gradient(180deg,#f7fbff 0%, var(--soft-bg) 100%);
+        }
+
+        header{
+            background:linear-gradient(135deg,#3f8cf0,#2f78da);
+            padding:18px 28px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            color:#fff;
+            box-shadow:0 8px 24px rgba(26,87,173,.16);
+            gap:12px;
+            flex-wrap:wrap;
+        }
+
+        .header-brand{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            font-size:1.2rem;
+            font-weight:800;
+        }
+
+        .header-brand .brand-icon{
+            width:42px;
+            height:42px;
+            border-radius:14px;
+            background:rgba(255,255,255,.18);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:1.2rem;
+        }
+
+        .header-user{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            background:rgba(255,255,255,.12);
+            padding:10px 14px;
+            border-radius:16px;
+            font-weight:700;
+        }
+
+        .page{
+            max-width:1080px;
+            margin:34px auto;
+            padding:0 18px 40px;
+        }
+
+        .layout{
+            display:grid;
+            grid-template-columns:320px minmax(0,1fr);
+            gap:22px;
+            align-items:start;
+        }
+
+        .card{
+            background:var(--card-bg);
+            backdrop-filter:blur(12px);
+            border:1px solid rgba(255,255,255,.75);
+            border-radius:28px;
+            box-shadow:var(--shadow);
+        }
+
+        .side-card{
+            padding:22px;
+            position:sticky;
+            top:18px;
+        }
+
+        .patient-summary{
+            background:linear-gradient(135deg,#f5f9ff,#eef4ff);
+            border:1px solid #dde8f7;
+            border-radius:24px;
+            padding:20px;
+        }
+
+        .avatar{
+            width:74px;
+            height:74px;
+            border-radius:20px;
+            background:linear-gradient(135deg,#2f80ed,#4a86e8);
+            color:#fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:1.6rem;
+            font-weight:800;
+            margin-bottom:16px;
+            box-shadow:0 12px 22px rgba(47,128,237,.18);
+        }
+
+        .patient-name{
+            font-size:1.4rem;
+            font-weight:800;
+            color:#22355b;
+            margin-bottom:6px;
+            line-height:1.2;
+        }
+
+        .patient-role{
+            color:#66768d;
+            margin-bottom:16px;
+        }
+
+        .summary-list{
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+        }
+
+        .summary-item{
+            background:#fff;
+            border:1px solid #e3ebf7;
+            border-radius:18px;
+            padding:14px 15px;
+        }
+
+        .summary-label{
+            font-size:.82rem;
+            font-weight:800;
+            color:#7a8aa1;
+            text-transform:uppercase;
+            margin-bottom:5px;
+            letter-spacing:.03em;
+        }
+
+        .summary-value{
+            font-weight:700;
+            color:#243447;
+            line-height:1.4;
+            word-break:break-word;
+        }
+
+        .side-note{
+            margin-top:18px;
+            padding:18px;
+            border-radius:22px;
+            background:linear-gradient(180deg,#f5f9ff,#eef5ff);
+            border:1px solid #dbe7f7;
+        }
+
+        .side-note h3{
+            margin:0 0 10px;
+            font-size:1.1rem;
+            color:#22355b;
+        }
+
+        .side-note p{
+            margin:0;
+            color:#66768d;
+            line-height:1.7;
+        }
+
+        .main-card{
+            padding:28px;
+        }
+
+        .hero{
+            margin-bottom:22px;
+        }
+
+        .hero h1{
+            margin:0 0 8px;
+            font-size:2.3rem;
+            color:#1f3155;
+        }
+
+        .hero p{
+            margin:0;
+            color:#66768d;
+            line-height:1.7;
+            font-size:1rem;
+        }
+
+        .status-box{
+            margin-bottom:18px;
+            padding:14px 16px;
+            border-radius:16px;
+            font-weight:600;
+            line-height:1.5;
+        }
+
+        .status-box.success{
+            background:var(--success-bg);
+            color:var(--success-text);
+            border:1px solid var(--success-line);
+        }
+
+        .status-box.error{
+            background:var(--error-bg);
+            color:var(--error-text);
+            border:1px solid var(--error-line);
+        }
+
+        .form-shell{
+            background:linear-gradient(135deg,#f5f9ff,#eef4ff);
+            border:1px solid #dde8f7;
+            border-radius:24px;
+            padding:22px;
+        }
+
+        .form-title{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            margin-bottom:18px;
+            flex-wrap:wrap;
+        }
+
+        .form-title h2{
+            margin:0;
+            font-size:1.35rem;
+            color:#22355b;
+        }
+
+        .form-title span{
+            color:#66768d;
+            font-weight:600;
+        }
+
+        .form-grid{
+            display:grid;
+            grid-template-columns:repeat(2, minmax(0, 1fr));
+            gap:18px;
+        }
+
+        .field{
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+        }
+
+        .field.full{
+            grid-column:1 / -1;
+        }
+
+        label{
+            font-size:.93rem;
+            font-weight:800;
+            color:#35537a;
+        }
+
+        input,
+        select,
+        textarea{
+            width:100%;
+            padding:14px 15px;
+            border-radius:16px;
+            border:1px solid #cfdced;
+            background:#fff;
+            color:#243447;
+            font-size:.98rem;
+            outline:none;
+            transition:.2s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus{
+            border-color:var(--primary);
+            box-shadow:0 0 0 4px rgba(47,128,237,.10);
+        }
+
+        textarea{
+            min-height:130px;
+            resize:vertical;
+        }
+
+        .field-hint{
+            color:#7a8aa1;
+            font-size:.85rem;
+            line-height:1.5;
+        }
+
+        .actions{
+            display:flex;
+            gap:12px;
+            flex-wrap:wrap;
+            margin-top:24px;
+        }
+
+        .btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            text-decoration:none;
+            padding:13px 20px;
+            border-radius:16px;
+            font-weight:800;
+            border:none;
+            cursor:pointer;
+            transition:.2s ease;
+        }
+
+        .btn-primary{
+            background:linear-gradient(135deg,#2f80ed,#4a86e8);
+            color:#fff;
+            box-shadow:0 12px 22px rgba(47,128,237,.18);
+        }
+
+        .btn-primary:hover{
+            transform:translateY(-1px);
+        }
+
+        .btn-secondary{
+            background:#f6f9fd;
+            color:#51627c;
+            border:1px solid #dbe5f2;
+        }
+
+        .mini-badges{
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-top:16px;
+        }
+
+        .mini-badge{
+            background:#fff;
+            border:1px solid #dde8f7;
+            color:#4f6482;
+            border-radius:999px;
+            padding:8px 12px;
+            font-size:.86rem;
+            font-weight:700;
+        }
+
+        @media (max-width: 980px){
+            .layout{
+                grid-template-columns:1fr;
+            }
+
+            .side-card{
+                position:relative;
+                top:0;
+            }
+        }
+
+        @media (max-width: 768px){
+            header{
+                padding:16px 18px;
+                align-items:flex-start;
+            }
+
+            .main-card{
+                padding:22px;
+            }
+
+            .hero h1{
+                font-size:1.9rem;
+            }
+
+            .form-grid{
+                grid-template-columns:1fr;
+            }
+
+            .actions{
+                flex-direction:column;
+            }
+
+            .btn{
+                width:100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-brand">
+        <div class="brand-icon">🩺</div>
+        <span>Portal de pacientes | Clínica San Lucas</span>
+    </div>
+
+    <div class="header-user">
+        <span>👤</span>
+        <span>{{ cuenta.nombre }} {{ cuenta.apellido_paterno }}</span>
+    </div>
+</header>
+
+<div class="page">
+    <div class="layout">
+
+        <aside class="side-card card">
+            <div class="patient-summary">
+                <div class="avatar">
+                    {{ cuenta.nombre[0] }}{{ cuenta.apellido_paterno[0] }}
+                </div>
+
+                <div class="patient-name">
+                    {{ cuenta.nombre }} {{ cuenta.apellido_paterno }}
+                </div>
+
+                <div class="patient-role">Paciente con acceso activo al portal</div>
+
+                <div class="summary-list">
+                    <div class="summary-item">
+                        <div class="summary-label">Expediente</div>
+                        <div class="summary-value">{{ cuenta.numero_expediente }}</div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">Correo</div>
+                        <div class="summary-value">{{ cuenta.correo }}</div>
+                    </div>
+                </div>
+
+                <div class="mini-badges">
+                    <div class="mini-badge">Nueva cita</div>
+                    <div class="mini-badge">Seguimiento médico</div>
+                </div>
+            </div>
+
+            <div class="side-note">
+                <h3>¿Qué vas a registrar aquí?</h3>
+                <p>
+                    Solo necesitas seleccionar el médico, la fecha, la hora y escribir
+                    el motivo de tu consulta. Tus datos personales ya están registrados
+                    en el sistema.
+                </p>
+            </div>
+        </aside>
+
+        <main class="main-card card">
+            <div class="hero">
+                <h1>Agendar nueva cita</h1>
+                <p>
+                    Programa una nueva consulta médica de forma rápida. Completa
+                    los datos de la cita y confirma tu solicitud.
+                </p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="status-box {% if category == 'success' %}success{% else %}error{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="form-shell">
+                <div class="form-title">
+                    <h2>Datos de la cita</h2>
+                    <span>Completa los campos requeridos</span>
+                </div>
+
+                <form method="POST">
+                    <div class="form-grid">
+
+                        <div class="field">
+                            <label for="id_doctor">Médico</label>
+                            <select name="id_doctor" id="id_doctor" required>
+                                <option value="">Selecciona un médico</option>
+                                {% for doctor in doctores %}
+                                    <option value="{{ doctor.id_doctor }}"
+                                        {% if request.form.get('id_doctor') == doctor.id_doctor|string %}selected{% endif %}>
+                                        Dr./Dra. {{ doctor.nombre }} {{ doctor.apellido_paterno }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="field-hint">Selecciona al profesional que atenderá tu consulta.</div>
+                        </div>
+
+                        <div class="field">
+                            <label for="fecha">Fecha</label>
+                            <input
+                                type="date"
+                                name="fecha"
+                                id="fecha"
+                                min="{{ fecha_hoy }}"
+                                value="{{ request.form.get('fecha', '') }}"
+                                required
+                            >
+                            <div class="field-hint">Elige una fecha disponible para tu atención.</div>
+                        </div>
+
+                        <div class="field">
+                            <label for="hora">Hora</label>
+                            <input
+                                type="time"
+                                name="hora"
+                                id="hora"
+                                value="{{ request.form.get('hora', '') }}"
+                                required
+                            >
+                            <div class="field-hint">Selecciona el horario que mejor se adapte a ti.</div>
+                        </div>
+
+                        <div class="field full">
+                            <label for="motivo">Motivo de la cita</label>
+                            <textarea
+                                name="motivo"
+                                id="motivo"
+                                placeholder="Describe brevemente el motivo de tu consulta..."
+                                required
+                            >{{ request.form.get('motivo', '') }}</textarea>
+                            <div class="field-hint">
+                                Escribe el motivo principal de tu consulta para facilitar la atención médica.
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn-primary">Guardar cita</button>
+                        <a href="{{ url_for('paciente_auth.panel_paciente') }}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+    </div>
+</div>
+
+</body>
+</html>

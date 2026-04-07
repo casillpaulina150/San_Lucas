@@ -826,6 +826,219 @@
         flex-direction:column;
     }
 }
+.profile-status{
+    margin-bottom:16px;
+    padding:14px 16px;
+    border-radius:16px;
+    font-weight:600;
+    line-height:1.5;
+}
+
+.profile-status.success{
+    background:#ecfdf3;
+    color:#166534;
+    border:1px solid #bbf7d0;
+}
+
+.profile-status.error{
+    background:#fef2f2;
+    color:#b91c1c;
+    border:1px solid #fecaca;
+}
+
+.profile-complete-box{
+    margin-top:20px;
+    padding:18px;
+    border-radius:20px;
+    background:linear-gradient(135deg,#f5f9ff,#eef4ff);
+    border:1px solid #dde8f7;
+}
+
+.profile-complete-title{
+    font-size:1rem;
+    font-weight:800;
+    color:#22355b;
+    margin-bottom:8px;
+}
+
+.profile-complete-text{
+    margin:0 0 14px;
+    color:#66768d;
+    line-height:1.6;
+}
+
+.profile-complete-form{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+}
+
+.profile-date-input{
+    min-width:220px;
+    padding:12px 14px;
+    border-radius:14px;
+    border:1px solid #dbe5f2;
+    background:#fff;
+    color:#243447;
+    font-size:0.98rem;
+    outline:none;
+}
+
+.profile-date-input:focus{
+    border-color:#2f80ed;
+    box-shadow:0 0 0 3px rgba(47,128,237,.10);
+}
+
+@media (max-width: 768px){
+    .profile-complete-form{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .profile-date-input{
+        width:100%;
+        min-width:0;
+    }
+}
+
+.reco-modal-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 9999;
+}
+
+.reco-modal-overlay.active{
+    display: flex;
+}
+
+.reco-modal{
+    width: 100%;
+    max-width: 760px;
+    background: rgba(255,255,255,.97);
+    border: 1px solid rgba(255,255,255,.75);
+    border-radius: 28px;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+    overflow: hidden;
+    animation: recoFade .2s ease;
+}
+
+@keyframes recoFade{
+    from{
+        opacity: 0;
+        transform: translateY(10px) scale(.98);
+    }
+    to{
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.reco-modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:22px 24px;
+    background:linear-gradient(135deg,#3f8cf0,#2f78da);
+    color:#fff;
+}
+
+.reco-modal-title{
+    margin:0;
+    font-size:1.35rem;
+    font-weight:800;
+}
+
+.reco-modal-close{
+    border:none;
+    background:rgba(255,255,255,.14);
+    color:#fff;
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    font-size:1.2rem;
+    cursor:pointer;
+    font-weight:800;
+}
+
+.reco-modal-body{
+    padding:24px;
+}
+
+.reco-modal-intro{
+    margin:0 0 18px;
+    color:#66768d;
+    line-height:1.7;
+}
+
+.reco-modal-section{
+    background:linear-gradient(135deg,#f5f9ff,#eef4ff);
+    border:1px solid #dde8f7;
+    border-radius:20px;
+    padding:18px;
+    margin-bottom:14px;
+}
+
+.reco-modal-section:last-child{
+    margin-bottom:0;
+}
+
+.reco-modal-section h4{
+    margin:0 0 8px;
+    font-size:1.02rem;
+    color:#22355b;
+}
+
+.reco-modal-section p{
+    margin:0;
+    color:#66768d;
+    line-height:1.7;
+}
+
+.reco-modal-actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:22px;
+}
+.dashboard-status{
+    margin-bottom:18px;
+    padding:14px 16px;
+    border-radius:16px;
+    font-weight:600;
+    line-height:1.5;
+}
+
+.dashboard-status.success{
+    background:#ecfdf3;
+    color:#166534;
+    border:1px solid #bbf7d0;
+}
+
+.dashboard-status.error{
+    background:#fef2f2;
+    color:#b91c1c;
+    border:1px solid #fecaca;
+}
+
+.cita-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:12px;
+}
+
+.mini-btn.danger{
+    background:#fff5f5;
+    color:#c0392b;
+    border:1px solid #f2c9c9;
+}
     </style>
 </head>
 <body>
@@ -857,13 +1070,6 @@
                 <a href="javascript:void(0)" onclick="abrirModalPerfil()">👤 Mi perfil</a>
             </nav>
 
-            <div class="sidebar-extra">
-                <h3>¿Necesitas ayuda?</h3>
-                <p>
-                    Aquí puedes agregar un texto corto con información importante,
-                    recordatorios o un acceso rápido para el paciente.
-                </p>
-            </div>
         </aside>
 
         <main class="mid-column">
@@ -876,6 +1082,17 @@
             </section>
 
 <section class="next-cita-card card-soft">
+    {% if cita_cancelada %}
+    <div class="dashboard-status success">
+        La cita se canceló correctamente.
+    </div>
+{% endif %}
+
+{% if cita_error %}
+    <div class="dashboard-status error">
+        No se pudo cancelar la cita. Verifica que siga vigente e inténtalo nuevamente.
+    </div>
+{% endif %}
     <div class="section-title">
         <h2>Próxima cita</h2>
         <a href="{{ url_for('paciente_auth.mis_citas_paciente') }}" class="section-link">Ver todas las citas</a>
@@ -984,7 +1201,7 @@
             </p>
 
             <div class="agenda-actions">
-                <a href="{{ url_for('cita.agendar_cita') }}" class="mini-btn">Agendar cita</a>
+                <a href="{{ url_for('paciente_auth.agendar_cita_paciente') }}" class="mini-btn">Agendar cita</a>
                 <a href="{{ url_for('paciente_auth.mis_citas_paciente') }}" class="mini-btn secondary">Ver mis citas</a>
             </div>
 
@@ -1004,9 +1221,17 @@
                             <div style="color:#5f6f84; margin-bottom:4px;">
                                 <strong>Médico:</strong> {{ cita.doctor_nombre }} {{ cita.doctor_apellido }}
                             </div>
-                            <div style="color:#5f6f84;">
-                                <strong>Motivo:</strong> {{ cita.motivo if cita.motivo else 'Sin motivo registrado' }}
-                            </div>
+                           <div style="color:#5f6f84;">
+    <strong>Motivo:</strong> {{ cita.motivo if cita.motivo else 'Sin motivo registrado' }}
+</div>
+
+<div class="cita-actions">
+    <form method="POST" action="{{ url_for('paciente_auth.cancelar_cita_paciente_route', id_cita=cita.id_cita) }}" onsubmit="return confirm('¿Deseas cancelar esta cita?');">
+        <button type="submit" class="mini-btn danger">
+            Cancelar cita
+        </button>
+    </form>
+</div>
                         </div>
                         {% endfor %}
                     </div>
@@ -1099,19 +1324,19 @@
                 <div class="reco-box">
                     <h4>Consejos de nutrición</h4>
                     <p>Aprende a llevar una alimentación más equilibrada y saludable.</p>
-                    <a href="#">Leer más</a>
+                    <a href="javascript:void(0)" onclick="abrirModalRecomendacion('nutricion')">Leer más</a>
                 </div>
 
                 <div class="reco-box">
                     <h4>Bienestar emocional</h4>
                     <p>Explora sugerencias prácticas para cuidar tu mente y tu bienestar.</p>
-                    <a href="#">Leer más</a>
+                    <a href="javascript:void(0)" onclick="abrirModalRecomendacion('bienestar')">Leer más</a>
                 </div>
 
                 <div class="reco-box">
                     <h4>Seguridad y privacidad</h4>
                     <p>Mantén segura tu información médica y conoce tus accesos disponibles.</p>
-                    <a href="#">Leer más</a>
+                    <a href="javascript:void(0)" onclick="abrirModalRecomendacion('seguridad')">Leer más</a>
                 </div>
             </section>
 
@@ -1127,6 +1352,17 @@
         </div>
 
         <div class="profile-modal-body">
+            {% if perfil_actualizado %}
+    <div class="profile-status success">
+        La fecha de nacimiento se guardó correctamente.
+    </div>
+{% endif %}
+
+{% if perfil_error %}
+    <div class="profile-status error">
+        No se pudo guardar la fecha de nacimiento. Verifica el dato e inténtalo de nuevo.
+    </div>
+{% endif %}
             <div class="profile-modal-top">
                 <div class="profile-modal-avatar">
                     {{ cuenta.nombre[0] }}{{ cuenta.apellido_paterno[0] }}
@@ -1186,11 +1422,33 @@
                 </div>
 
                 <div class="profile-modal-item">
-                    <div class="profile-modal-label">Fecha de nacimiento</div>
-                    <div class="profile-modal-value">
-                        {{ cuenta.fecha_nacimiento if cuenta.fecha_nacimiento else 'No registrada' }}
-                    </div>
-                </div>
+    <div class="profile-modal-label">Fecha de nacimiento</div>
+    <div class="profile-modal-value">
+        {{ cuenta.get('fecha_nacimiento', 'No registrada') if cuenta.get('fecha_nacimiento') else 'No registrada' }}
+    </div>
+</div>
+{% if not cuenta.get('fecha_nacimiento') %}
+    <div class="profile-complete-box">
+        <div class="profile-complete-title">Completa tu fecha de nacimiento</div>
+        <p class="profile-complete-text">
+            Este dato aún no está registrado en tu perfil. Puedes guardarlo aquí mismo.
+        </p>
+
+        <form method="POST" action="{{ url_for('paciente_auth.guardar_fecha_nacimiento_paciente') }}" class="profile-complete-form">
+            <input
+                type="date"
+                name="fecha_nacimiento"
+                class="profile-date-input"
+                max="{{ fecha_maxima_hoy }}"
+                required
+            >
+
+            <button type="submit" class="mini-btn">
+                Guardar fecha
+            </button>
+        </form>
+    </div>
+{% endif %}
             </div>
 
             <div class="profile-modal-actions">
@@ -1220,12 +1478,136 @@
         document.body.style.overflow = '';
     }
 
+       document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modalPerfil = document.getElementById('modalPerfil');
+            const modalAyuda = document.getElementById('modalAyuda');
+            const modalRecomendacion = document.getElementById('modalRecomendacion');
+
+            if (modalPerfil) modalPerfil.classList.remove('active');
+            if (modalAyuda) modalAyuda.classList.remove('active');
+            if (modalRecomendacion) modalRecomendacion.classList.remove('active');
+
+            document.body.style.overflow = '';
+        }
+    });
+     function abrirModalPerfil() {
+        document.getElementById('modalPerfil').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModalPerfil(event) {
+        if (event && event.target && !event.target.classList.contains('profile-modal-overlay')) {
+            return;
+        }
+
+        document.getElementById('modalPerfil').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             document.getElementById('modalPerfil').classList.remove('active');
             document.body.style.overflow = '';
         }
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const abrirModal = "{{ abrir_modal }}";
+        if (abrirModal === "perfil") {
+            abrirModalPerfil();
+        }
+    });
+    const recomendacionesContenido = {
+        nutricion: {
+            title: "Consejos de nutrición",
+            intro: "Mantener una alimentación equilibrada puede ayudarte a mejorar tu energía, digestión y bienestar general.",
+            subtitle1: "Organiza tus comidas",
+            text1: "Procura establecer horarios regulares para tus comidas principales y evita largos periodos sin alimentarte.",
+            subtitle2: "Hidratación diaria",
+            text2: "Beber suficiente agua durante el día favorece múltiples funciones del organismo y mejora tu sensación de bienestar.",
+            subtitle3: "Seguimiento médico",
+            text3: "Si tienes un plan alimenticio o indicaciones médicas, lo ideal es seguirlo con constancia y acudir a tus revisiones."
+        },
+        bienestar: {
+            title: "Bienestar emocional",
+            intro: "Cuidar tu salud emocional también forma parte de tu bienestar integral.",
+            subtitle1: "Descanso y rutina",
+            text1: "Dormir bien y mantener una rutina diaria ordenada puede ayudarte a reducir estrés y sentir mayor estabilidad.",
+            subtitle2: "Expresa cómo te sientes",
+            text2: "Hablar con alguien de confianza o con un profesional puede ayudarte a gestionar mejor tus emociones.",
+            subtitle3: "Busca apoyo cuando lo necesites",
+            text3: "Si notas ansiedad, agotamiento o cambios importantes en tu estado de ánimo, es recomendable pedir orientación profesional."
+        },
+        seguridad: {
+            title: "Seguridad y privacidad",
+            intro: "Tu portal contiene información personal y médica, por eso es importante mantener tu acceso protegido.",
+            subtitle1: "Protege tu contraseña",
+            text1: "No compartas tu contraseña con otras personas y cámbiala si consideras que alguien pudo conocerla.",
+            subtitle2: "Cierra sesión al terminar",
+            text2: "Especialmente en equipos compartidos, cerrar sesión ayuda a proteger tu información personal y médica.",
+            subtitle3: "Verifica tus datos",
+            text3: "Revisa que tu correo y tus datos principales estén correctos para mantener actualizado tu acceso al sistema."
+        }
+    };
+
+    function abrirModalRecomendacion(tipo) {
+        const data = recomendacionesContenido[tipo];
+        if (!data) return;
+
+        document.getElementById('recoModalTitle').textContent = data.title;
+        document.getElementById('recoModalIntro').textContent = data.intro;
+        document.getElementById('recoModalSubtitle1').textContent = data.subtitle1;
+        document.getElementById('recoModalText1').textContent = data.text1;
+        document.getElementById('recoModalSubtitle2').textContent = data.subtitle2;
+        document.getElementById('recoModalText2').textContent = data.text2;
+        document.getElementById('recoModalSubtitle3').textContent = data.subtitle3;
+        document.getElementById('recoModalText3').textContent = data.text3;
+
+        document.getElementById('modalRecomendacion').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModalRecomendacion(event) {
+        if (event && event.target && !event.target.classList.contains('reco-modal-overlay')) {
+            return;
+        }
+
+        document.getElementById('modalRecomendacion').classList.remove('active');
+        document.body.style.overflow = '';
+    }
 </script>
+<div id="modalRecomendacion" class="reco-modal-overlay" onclick="cerrarModalRecomendacion(event)">
+    <div class="reco-modal">
+        <div class="reco-modal-header">
+            <h3 id="recoModalTitle" class="reco-modal-title">Recomendación</h3>
+            <button type="button" class="reco-modal-close" onclick="cerrarModalRecomendacion()">×</button>
+        </div>
+
+        <div class="reco-modal-body">
+            <p id="recoModalIntro" class="reco-modal-intro"></p>
+
+            <div class="reco-modal-section">
+                <h4 id="recoModalSubtitle1"></h4>
+                <p id="recoModalText1"></p>
+            </div>
+
+            <div class="reco-modal-section">
+                <h4 id="recoModalSubtitle2"></h4>
+                <p id="recoModalText2"></p>
+            </div>
+
+            <div class="reco-modal-section">
+                <h4 id="recoModalSubtitle3"></h4>
+                <p id="recoModalText3"></p>
+            </div>
+
+            <div class="reco-modal-actions">
+                <a href="{{ url_for('cita.agendar_cita') }}" class="mini-btn">Agendar cita</a>
+                <a href="{{ url_for('paciente_auth.panel_paciente') }}" class="mini-btn secondary">Volver al inicio</a>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

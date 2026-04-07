@@ -1,3 +1,4 @@
+from datos.consultas_citas import obtener_doctores, registrar_cita_paciente_existente
 import calendar
 from datetime import date, datetime
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
@@ -11,7 +12,9 @@ from datos.consultas_paciente_auth import (
     obtener_proximas_citas_paciente,
     obtener_resumen_citas_paciente,
     obtener_historial_paciente,
-    obtener_recetas_paciente
+    obtener_recetas_paciente,
+    actualizar_fecha_nacimiento_paciente,
+    cancelar_cita_paciente
 )
 
 paciente_auth = Blueprint("paciente_auth", __name__)
@@ -199,6 +202,13 @@ def panel_paciente():
     total_proximas = resumen_citas["total_proximas"] if resumen_citas else 0
     calendario_paciente = construir_calendario_paciente(proximas_citas)
 
+    abrir_modal = request.args.get("abrir_modal")
+    perfil_actualizado = request.args.get("perfil_actualizado")
+    perfil_error = request.args.get("perfil_error")
+    fecha_maxima_hoy = date.today().isoformat()
+    cita_cancelada = request.args.get("cita_cancelada")
+    cita_error = request.args.get("cita_error")
+
     return render_template(
     "panel_paciente.html",
     cuenta=cuenta,
@@ -211,7 +221,13 @@ def panel_paciente():
     ultima_consulta_historial=ultima_consulta_historial,
     recetas_paciente=recetas_paciente,
     total_recetas=total_recetas,
-    ultima_receta=ultima_receta
+    ultima_receta=ultima_receta,
+    abrir_modal=abrir_modal,
+    perfil_actualizado=perfil_actualizado,
+    perfil_error=perfil_error,
+    fecha_maxima_hoy=fecha_maxima_hoy,
+    cita_cancelada=cita_cancelada,
+    cita_error=cita_error,
 )
 
 @paciente_auth.route("/paciente/mis-citas")
@@ -292,6 +308,145 @@ def recetas_paciente():
         recetas=recetas,
         total_recetas=total_recetas,
         ultima_receta=ultima_receta
+    )
+
+@paciente_auth.route("/paciente/guardar-fecha-nacimiento", methods=["POST"])
+def guardar_fecha_nacimiento_paciente():
+    if not paciente_logueado():
+        return redirect(url_for("paciente_auth.login_paciente"))
+
+    id_cuenta_paciente = session.get("id_cuenta_paciente")
+    cuenta = obtener_cuenta_paciente_por_id(id_cuenta_paciente)
+
+    if not cuenta:
+        session.clear()
+        return redirect(url_for("paciente_auth.login_paciente"))
+
+    fecha_nacimiento = request.form.get("fecha_nacimiento", "").strip()
+
+    if not fecha_nacimiento:
+        return redirect(url_for(
+            "paciente_auth.panel_paciente",
+            abrir_modal="perfil",
+            perfil_error="1"
+        ))
+
+    try:
+        fecha_obj = datetime.strptime(fecha_nacimiento, "%Y-%m-%d").date()
+    except ValueError:
+        return redirect(url_for(
+            "paciente_auth.panel_paciente",
+            abrir_modal="perfil",
+            perfil_error="1"
+        ))
+
+    if fecha_obj > date.today():
+        return redirect(url_for(
+            "paciente_auth.panel_paciente",
+            abrir_modal="perfil",
+            perfil_error="1"
+        ))
+
+    actualizado = actualizar_fecha_nacimiento_paciente(
+        cuenta["id_paciente"],
+        fecha_nacimiento
+    )
+
+    if not actualizado:
+        return redirect(url_for(
+            "paciente_auth.panel_paciente",
+            abrir_modal="perfil",
+            perfil_error="1"
+        ))
+
+    return redirect(url_for(
+        "paciente_auth.panel_paciente",
+        abrir_modal="perfil",
+        perfil_actualizado="1"
+    ))
+
+@paciente_auth.route("/paciente/cancelar-cita/<int:id_cita>", methods=["POST"])
+def cancelar_cita_paciente_route(id_cita):
+    if not paciente_logueado():
+        return redirect(url_for("paciente_auth.login_paciente"))
+
+    id_cuenta_paciente = session.get("id_cuenta_paciente")
+    cuenta = obtener_cuenta_paciente_por_id(id_cuenta_paciente)
+
+    if not cuenta:
+        session.clear()
+        return redirect(url_for("paciente_auth.login_paciente"))
+
+    if int(cuenta["debe_cambiar_password"]) == 1:
+        return redirect(url_for("paciente_auth.cambiar_password_inicial"))
+
+    cancelada = cancelar_cita_paciente(id_cita, cuenta["id_paciente"])
+
+    if not cancelada:
+        return redirect(url_for(
+            "paciente_auth.panel_paciente",
+            cita_error="1"
+        ))
+
+    return redirect(url_for(
+        "paciente_auth.panel_paciente",
+        cita_cancelada="1"
+    ))
+
+@paciente_auth.route("/paciente/agendar-cita", methods=["GET", "POST"])
+def agendar_cita_paciente():
+    if not paciente_logueado():
+        return redirect(url_for("paciente_auth.login_paciente"))
+
+    id_cuenta_paciente = session.get("id_cuenta_paciente")
+    cuenta = obtener_cuenta_paciente_por_id(id_cuenta_paciente)
+
+    if not cuenta:
+        session.clear()
+        return redirect(url_for("paciente_auth.login_paciente"))
+
+    doctores = obtener_doctores()
+
+    if request.method == "POST":
+        id_doctor = request.form.get("id_doctor")
+        fecha = request.form.get("fecha")
+        hora = request.form.get("hora")
+        motivo = request.form.get("motivo", "").strip()
+
+        if not id_doctor or not fecha or not hora or not motivo:
+            flash("Completa todos los campos de la cita.", "error")
+            return render_template(
+                "agendar_cita_paciente.html",
+                cuenta=cuenta,
+                doctores=doctores,
+                fecha_hoy=date.today().isoformat()
+            )
+
+        guardada, error_db = registrar_cita_paciente_existente(
+            id_paciente=cuenta["id_paciente"],
+            id_doctor=int(id_doctor),
+            fecha=fecha,
+            hora=hora,
+            motivo=motivo
+        )
+
+        if not guardada:
+            flash(error_db or "No se pudo registrar la cita.", "error")
+            return render_template(
+                "agendar_cita_paciente.html",
+                cuenta=cuenta,
+                doctores=doctores,
+                fecha_hoy=date.today().isoformat()
+            )
+
+        flash("La cita se agendó correctamente.", "success")
+        return redirect(url_for("paciente_auth.panel_paciente"))
+
+    return render_template(
+        "agendar_cita_paciente.html",
+        cuenta=cuenta,
+        doctores=doctores,
+        fecha_hoy=date.today().isoformat()
     )
 
 @paciente_auth.route("/paciente/logout")

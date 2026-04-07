@@ -247,3 +247,48 @@ def obtener_recetas_paciente(id_paciente):
     cursor.close()
     conexion.close()
     return recetas
+
+def actualizar_fecha_nacimiento_paciente(id_paciente, fecha_nacimiento):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    try:
+        query = """
+            UPDATE pacientes
+            SET fecha_nacimiento = %s
+            WHERE id_paciente = %s
+        """
+        cursor.execute(query, (fecha_nacimiento, id_paciente))
+        conexion.commit()
+        return cursor.rowcount > 0
+    except Exception:
+        conexion.rollback()
+        return False
+    finally:
+        cursor.close()
+        conexion.close()
+
+def cancelar_cita_paciente(id_cita, id_paciente):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    try:
+        query = """
+            DELETE FROM citas
+            WHERE id_cita = %s
+              AND id_paciente = %s
+              AND (
+                    fecha > CURDATE()
+                    OR (fecha = CURDATE() AND hora >= CURTIME())
+                  )
+        """
+        cursor.execute(query, (id_cita, id_paciente))
+        conexion.commit()
+        return cursor.rowcount > 0
+    except Exception as e:
+        conexion.rollback()
+        print("Error al cancelar cita del paciente:", e)
+        return False
+    finally:
+        cursor.close()
+        conexion.close()

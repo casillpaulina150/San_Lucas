@@ -176,3 +176,82 @@ def obtener_horas_ocupadas(id_doctor, fecha):
     conexion.close()
 
     return [fila[0] for fila in resultados]
+
+def registrar_cita_paciente_existente(id_paciente, id_doctor, fecha, hora, motivo):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    try:
+        query = """
+            INSERT INTO citas (id_paciente, id_doctor, fecha, hora, motivo, folio)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+
+        folio = generar_folio_cita()  # usa tu función actual si ya existe
+        cursor.execute(query, (id_paciente, id_doctor, fecha, hora, motivo, folio))
+        conexion.commit()
+        return True
+    except Exception as e:
+        conexion.rollback()
+        print("Error al registrar cita del paciente:", e)
+        return False
+    finally:
+        cursor.close()
+        conexion.close()
+
+def obtener_doctores():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+
+    sql = """
+        SELECT 
+            d.id_doctor,
+            d.nombre,
+            d.apellido_paterno,
+            d.apellido_materno,
+            d.imagen,
+            e.nombre AS especialidad
+        FROM doctores d
+        INNER JOIN especialidades e
+            ON d.id_especialidad = e.id_especialidad
+        ORDER BY d.id_doctor
+    """
+    cursor.execute(sql)
+    doctores = cursor.fetchall()
+
+    cursor.close()
+    conexion.close()
+
+    return doctores
+
+def registrar_cita_paciente_existente(id_paciente, id_doctor, fecha, hora, motivo):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    try:
+        hora_normalizada = hora[:5]
+
+        horas_ocupadas = obtener_horas_ocupadas(id_doctor, fecha)
+        if hora_normalizada in horas_ocupadas:
+            return False, "Ese horario ya no está disponible para el médico seleccionado."
+
+        folio = obtener_siguiente_folio()
+
+        sql = """
+            INSERT INTO citas (folio, id_paciente, id_doctor, fecha, hora, motivo)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        valores = (folio, id_paciente, id_doctor, fecha, hora_normalizada, motivo)
+
+        cursor.execute(sql, valores)
+        conexion.commit()
+        return True, None
+
+    except Exception as e:
+        conexion.rollback()
+        print("Error al registrar cita del paciente existente:", e)
+        return False, str(e)
+
+    finally:
+        cursor.close()
+        conexion.close()
