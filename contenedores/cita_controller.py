@@ -1,4 +1,11 @@
+import os
+import smtplib
+
+from dotenv import load_dotenv
 from flask import Blueprint, render_template, request, jsonify
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 from datos.consultas_citas import (
     obtener_doctor_por_nombre,
     obtener_siguiente_folio,
@@ -6,30 +13,23 @@ from datos.consultas_citas import (
     obtener_horas_ocupadas
 )
 from datos.consultas_generales import obtener_especialidades, obtener_doctores
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from datos.horarios import HORARIOS_CITA
+
+load_dotenv()
 
 cita = Blueprint("cita", __name__)
 
-HORARIOS_DISPONIBLES = [
-    "09:00",
-    "10:00",
-    "11:00",
-    "12:00",
-    "13:00",
-    "16:00",
-    "17:00",
-    "18:00"
-]
+HORARIOS_DISPONIBLES = HORARIOS_CITA
 
 
 def enviar_correo_confirmacion(destinatario, cita_info):
-    correo_emisor = "clinicasanlucas01@gmail.com"
-    contrasena = "xqpjavrjobshwzoi"
+    correo_emisor = os.getenv("MAIL_USER")
+    contrasena = os.getenv("MAIL_PASSWORD")
+
+    if not correo_emisor or not contrasena:
+        raise RuntimeError("Faltan MAIL_USER o MAIL_PASSWORD en el archivo .env")
 
     asunto = f"Confirmación de cita - Clínica San Lucas - Folio {cita_info['folio']}"
-
     cuerpo = f"""
 Hola {cita_info['nombre']} {cita_info['apellido_paterno']} {cita_info['apellido_materno']},
 
@@ -44,7 +44,7 @@ Hora: {cita_info['hora']}
 
 Clínica San Lucas
 Teléfono: 664 614 54 69
-Correo: clinicasanlucas01@gmail.com
+Correo: {correo_emisor}
 Dirección: Av. Paseo de los Héroes 10999, Zona Río, Tijuana, B.C., C.P. 22010
 
 Gracias por confiar en nosotros.
@@ -98,6 +98,7 @@ def agendar_cita():
             )
 
         horas_ocupadas = obtener_horas_ocupadas(doctor["id_doctor"], fecha)
+
         if hora in horas_ocupadas:
             mensaje = "Ese horario ya no está disponible para el médico seleccionado."
             return render_template(
@@ -160,10 +161,6 @@ def horarios_disponibles():
         return jsonify([])
 
     horas_ocupadas = obtener_horas_ocupadas(doctor["id_doctor"], fecha)
-
-    horas_libres = [
-        hora for hora in HORARIOS_DISPONIBLES
-        if hora not in horas_ocupadas
-    ]
+    horas_libres = [hora for hora in HORARIOS_DISPONIBLES if hora not in horas_ocupadas]
 
     return jsonify(horas_libres)

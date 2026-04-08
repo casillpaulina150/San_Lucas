@@ -1,5 +1,6 @@
 from datos.consultas_citas import obtener_doctores, registrar_cita_paciente_existente
 import calendar
+from datos.horarios import HORARIOS_CITA
 from datetime import date, datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -21,24 +22,6 @@ from datos.consultas_paciente_auth import (
 )
 
 paciente_auth = Blueprint("paciente_auth", __name__)
-
-def generar_horarios_cita():
-    horarios = []
-    hora = 9
-    minuto = 0
-
-    while hora < 18:
-        horarios.append(f"{hora:02d}:{minuto:02d}")
-        minuto += 30
-
-        if minuto == 60:
-            minuto = 0
-            hora += 1
-
-    return horarios
-
-
-HORARIOS_CITA = generar_horarios_cita()
 
 MESES_ES = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",

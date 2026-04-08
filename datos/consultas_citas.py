@@ -35,18 +35,20 @@ def obtener_siguiente_folio():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    sql = """
-        SELECT COALESCE(MAX(CAST(SUBSTRING(folio, 5) AS UNSIGNED)), 0)
-        FROM citas
-    """
-    cursor.execute(sql)
-    ultimo = cursor.fetchone()[0]
-    ultimo = int(ultimo or 0)
-
-    cursor.close()
-    conexion.close()
-
-    return f"CSL-{ultimo + 1:04d}"
+    try:
+        cursor.execute("""
+            SELECT COALESCE(MAX(CAST(SUBSTRING(folio, 5) AS UNSIGNED)), 0)
+            FROM citas
+            WHERE folio LIKE 'CSL-%'
+        """)
+        resultado = cursor.fetchone()
+        ultimo = int(resultado[0]) if resultado and resultado[0] is not None else 0
+        siguiente = ultimo + 1
+        return "CSL-" + str(siguiente).zfill(4)
+    finally:
+        cursor.close()
+        conexion.close()
+        
 
 
 def obtener_siguiente_expediente(cursor):

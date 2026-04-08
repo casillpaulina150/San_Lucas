@@ -1,7 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from werkzeug.security import generate_password_hash
-import secrets
-import string
 
 from datos.consultas_panel import (
     obtener_doctores_panel,
@@ -15,19 +13,26 @@ from datos.consultas_panel import (
 
 panel = Blueprint("panel", __name__)
 
+
+def acceso_panel():
+    return session.get("id_usuario") is not None and session.get("rol") != "medico"
+
+
 def generar_password_temporal(numero_expediente):
     if not numero_expediente:
         return "SL-2026"
 
     solo_numeros = "".join(filter(str.isdigit, numero_expediente))
     ultimos = solo_numeros[-4:] if solo_numeros else "0000"
-
     return f"SL-{ultimos}-26"
+
 
 @panel.route("/panel_citas")
 def panel_citas():
-    q = request.args.get("q", "").strip()
+    if not acceso_panel():
+        return redirect(url_for("auth.login"))
 
+    q = request.args.get("q", "").strip()
     doctores = obtener_doctores_panel()
     pacientes_panel = obtener_pacientes_panel_recepcion(q)
 
@@ -44,10 +49,13 @@ def panel_citas():
         resumen_panel=resumen_panel
     )
 
+
 @panel.route("/activar_cuenta_paciente/<int:id_paciente>", methods=["POST"])
 def activar_cuenta_paciente(id_paciente):
-    paciente = obtener_paciente_por_id_panel(id_paciente)
+    if not acceso_panel():
+        return redirect(url_for("auth.login"))
 
+    paciente = obtener_paciente_por_id_panel(id_paciente)
     if not paciente:
         flash("No se encontró el paciente.", "error")
         return redirect(url_for("panel.panel_citas"))
@@ -61,7 +69,6 @@ def activar_cuenta_paciente(id_paciente):
         return redirect(url_for("panel.panel_citas"))
 
     usuario = paciente["correo"].strip().lower()
-
     if usuario_paciente_existe(usuario):
         flash("Ese correo ya está siendo usado como usuario en otra cuenta de paciente.", "error")
         return redirect(url_for("panel.panel_citas"))
@@ -82,8 +89,12 @@ def activar_cuenta_paciente(id_paciente):
 
     return redirect(url_for("panel.panel_citas"))
 
+
 @panel.route("/api/citas_calendario")
 def api_citas_calendario():
+    if not acceso_panel():
+        return jsonify({"error": "No autorizado"}), 401
+
     citas = obtener_citas_calendario()
     eventos = []
 

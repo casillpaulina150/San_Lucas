@@ -4,6 +4,625 @@
     <meta charset="UTF-8">
     <title>Detalle de Cita | Clínica San Lucas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        :root {
+            --azul-1: #2f7dea;
+            --azul-2: #12b8d6;
+            --azul-3: #163a63;
+            --azul-4: #5e7593;
+            --texto: #18324f;
+            --borde: #dbe7f5;
+            --fondo: #f2f7fc;
+            --card: #ffffff;
+            --soft: #f7fbff;
+            --sombra: 0 18px 40px rgba(18, 63, 120, 0.10);
+            --radio-xl: 28px;
+            --radio-lg: 22px;
+            --radio-md: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(47, 125, 234, 0.10), transparent 28%),
+                linear-gradient(180deg, #f5f9fd 0%, #edf4fb 100%);
+            color: var(--texto);
+        }
+
+        .detalle-wrapper {
+            width: min(1400px, calc(100% - 34px));
+            margin: 34px auto 46px;
+        }
+
+        .detalle-hero {
+            background: linear-gradient(135deg, #ffffff 0%, #f7fbff 100%);
+            border: 1px solid #dfeaf7;
+            border-radius: 34px;
+            box-shadow: var(--sombra);
+            padding: 26px 30px;
+            margin-bottom: 24px;
+        }
+
+        .detalle-hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .detalle-hero h1 {
+            margin: 0;
+            color: var(--azul-3);
+            font-size: clamp(1.75rem, 2vw, 2.2rem);
+        }
+
+        .detalle-hero p {
+            margin: 6px 0 0;
+            color: var(--azul-4);
+        }
+
+        .detalle-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 18px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--azul-1), var(--azul-2));
+            color: #fff;
+            font-weight: 800;
+            box-shadow: 0 12px 24px rgba(29, 121, 220, 0.18);
+        }
+
+        .detalle-layout {
+            display: grid;
+            grid-template-columns: 320px minmax(0, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .panel-lateral {
+            position: sticky;
+            top: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .card-lateral,
+        .card-form {
+            background: var(--card);
+            border: 1px solid var(--borde);
+            border-radius: var(--radio-xl);
+            box-shadow: var(--sombra);
+        }
+
+        .card-lateral {
+            padding: 20px;
+        }
+
+        .card-lateral h3 {
+            margin: 0 0 14px;
+            color: var(--azul-3);
+            font-size: 1.15rem;
+        }
+
+        .resumen-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .resumen-item {
+            padding: 12px 14px;
+            border: 1px solid #e1ebf8;
+            border-radius: 18px;
+            background: var(--soft);
+        }
+
+        .resumen-label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #6a82a1;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+        }
+
+        .resumen-valor {
+            display: block;
+            color: var(--texto);
+            font-weight: 700;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+
+        .nav-rapida {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .nav-chip {
+            border: 1px solid #dbe7f5;
+            background: #f6faff;
+            color: var(--azul-3);
+            border-radius: 999px;
+            padding: 11px 10px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .nav-chip:hover {
+            background: #edf5ff;
+            transform: translateY(-1px);
+        }
+
+        .editor {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .mini-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .mini-tab {
+            border: 1px solid #dbe7f5;
+            background: rgba(255,255,255,.88);
+            color: var(--azul-3);
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .2s ease;
+            box-shadow: 0 8px 16px rgba(23, 78, 145, 0.06);
+        }
+
+        .mini-tab:hover {
+            background: #fff;
+            transform: translateY(-1px);
+        }
+
+        .accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .accordion-item {
+            background: var(--card);
+            border: 1px solid var(--borde);
+            border-radius: var(--radio-xl);
+            box-shadow: var(--sombra);
+            overflow: hidden;
+        }
+
+        .accordion-trigger {
+            width: 100%;
+            border: none;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 22px;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .accordion-trigger:hover {
+            background: #fbfdff;
+        }
+
+        .accordion-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .accordion-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, rgba(47,125,234,.12), rgba(18,184,214,.12));
+            color: var(--azul-1);
+            font-size: 1.15rem;
+            font-weight: 900;
+        }
+
+        .accordion-title {
+            margin: 0;
+            color: var(--azul-3);
+            font-size: 1.22rem;
+            font-weight: 800;
+        }
+
+        .accordion-subtitle {
+            margin: 4px 0 0;
+            color: var(--azul-4);
+            font-size: .93rem;
+        }
+
+        .accordion-arrow {
+            font-size: 1.4rem;
+            color: #6d87a7;
+            transition: transform .2s ease;
+            flex-shrink: 0;
+        }
+
+        .accordion-item.active .accordion-arrow {
+            transform: rotate(180deg);
+        }
+
+        .accordion-body {
+            display: none;
+            padding: 0 22px 22px;
+            border-top: 1px solid #e7eef8;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+        }
+
+        .accordion-item.active .accordion-body {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        .grupo-campo {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .grupo-campo-completo {
+            grid-column: 1 / -1;
+        }
+
+        .grupo-campo label {
+            font-size: .92rem;
+            font-weight: 800;
+            color: #35557d;
+        }
+
+        .grupo-campo input,
+        .grupo-campo select,
+        .grupo-campo textarea {
+            width: 100%;
+            border: 1px solid #d6e4f3;
+            border-radius: 16px;
+            background: #fbfdff;
+            color: var(--texto);
+            padding: 13px 14px;
+            font-size: .98rem;
+            transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+        }
+
+        .grupo-campo textarea {
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        .grupo-campo input:focus,
+        .grupo-campo select:focus,
+        .grupo-campo textarea:focus {
+            outline: none;
+            border-color: var(--azul-1);
+            box-shadow: 0 0 0 4px rgba(47,125,234,.10);
+            background: #fff;
+        }
+
+        .seguimiento-panel {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+            border: 1px solid var(--borde);
+            border-radius: 24px;
+            padding: 18px;
+        }
+
+        .seguimiento-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .seguimiento-top h4 {
+            margin: 0 0 4px;
+            color: var(--azul-3);
+            font-size: 1.12rem;
+        }
+
+        .seguimiento-top p {
+            margin: 0;
+            color: var(--azul-4);
+            line-height: 1.5;
+        }
+
+        .switch-seguimiento {
+            display: inline-flex;
+            align-items: center;
+            gap: .75rem;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: #f4f9ff;
+            border: 1px solid #dfeafa;
+            font-weight: 800;
+            color: #21466f;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .switch-seguimiento input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #2b7be4;
+            cursor: pointer;
+        }
+
+        .seguimiento-acciones {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .btn-seguimiento {
+            border: none;
+            border-radius: 999px;
+            padding: .9rem 1.35rem;
+            font-size: .96rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--azul-1), var(--azul-2));
+            color: #fff;
+            cursor: pointer;
+            transition: .2s ease;
+            box-shadow: 0 10px 22px rgba(36, 122, 215, 0.22);
+        }
+
+        .btn-seguimiento:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-seguimiento:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .seguimiento-resumen {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px dashed #bfd5f2;
+            border-radius: 18px;
+            background: #f5f9ff;
+            color: #4b6280;
+            line-height: 1.55;
+        }
+
+        .seguimiento-resumen strong {
+            color: #173d69;
+        }
+
+        .card-guardar {
+            background: var(--card);
+            border: 1px solid var(--borde);
+            border-radius: var(--radio-xl);
+            box-shadow: var(--sombra);
+            padding: 20px 22px 22px;
+        }
+
+        .card-guardar h3 {
+            margin: 0 0 6px;
+            color: var(--azul-3);
+            font-size: 1.15rem;
+        }
+
+        .card-guardar p {
+            margin: 0 0 18px;
+            color: var(--azul-4);
+        }
+
+        .btn-enviar-cita {
+            width: 100%;
+            border: none;
+            border-radius: 999px;
+            padding: 18px 20px;
+            background: linear-gradient(135deg, var(--azul-1), var(--azul-2));
+            color: #fff;
+            font-size: 1.15rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 18px 28px rgba(26, 123, 220, 0.20);
+            transition: .2s ease;
+        }
+
+        .btn-enviar-cita:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 20px 32px rgba(26, 123, 220, 0.24);
+        }
+
+        .modal-seguimiento {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 24, 44, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-seguimiento.activo {
+            display: flex;
+        }
+
+        .modal-seguimiento-contenido {
+            width: min(560px, 100%);
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 1.5rem;
+            box-shadow: 0 24px 55px rgba(12, 43, 84, 0.26);
+            animation: modalEntrada .18s ease;
+        }
+
+        @keyframes modalEntrada {
+            from {
+                opacity: 0;
+                transform: translateY(8px) scale(.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-seguimiento-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-seguimiento-header h3 {
+            margin: 0 0 .3rem;
+            color: var(--azul-3);
+        }
+
+        .modal-seguimiento-header p {
+            margin: 0;
+            color: #6f8098;
+        }
+
+        .btn-cerrar-modal {
+            background: #eef4fb;
+            color: #27496f;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .modal-grid .grupo-campo-completo {
+            grid-column: 1 / -1;
+        }
+
+        .mensaje-error-seguimiento {
+            display: none;
+            margin-top: .35rem;
+            font-size: .9rem;
+            color: #c0392b;
+            font-weight: 700;
+        }
+
+        .mensaje-error-seguimiento.activo {
+            display: block;
+        }
+
+        .modal-seguimiento-footer {
+            margin-top: 1.35rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: .8rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-modal-secundario,
+        .btn-modal-primario {
+            border: none;
+            border-radius: 999px;
+            padding: .85rem 1.25rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .btn-modal-secundario {
+            background: #eef4fb;
+            color: #244769;
+        }
+
+        .btn-modal-primario {
+            background: linear-gradient(135deg, var(--azul-1), var(--azul-2));
+            color: #fff;
+        }
+
+        @media (max-width: 1100px) {
+            .detalle-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-lateral {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .detalle-wrapper {
+                width: min(100% - 16px, 100%);
+                margin: 18px auto 28px;
+            }
+
+            .detalle-hero,
+            .card-lateral,
+            .accordion-item,
+            .card-guardar {
+                border-radius: 24px;
+            }
+
+            .form-grid,
+            .modal-grid,
+            .nav-rapida {
+                grid-template-columns: 1fr;
+            }
+
+            .mini-tabs {
+                gap: 8px;
+            }
+
+            .mini-tab {
+                width: 100%;
+                text-align: center;
+            }
+        }
+       
+    .campo-ayuda {
+        display: block;
+        margin-top: -2px;
+        margin-bottom: 2px;
+        font-size: 0.78rem;
+        line-height: 1.35;
+        color: #6c84a3;
+        font-weight: 600;
+    }
+    </style>
 </head>
 <body>
 
@@ -18,274 +637,612 @@
     </nav>
 </header>
 
-<section class="formulario-cita-seccion">
-    <div class="formulario-cita-contenedor" style="max-width: 1100px;">
-        <h2>Detalle de la Cita</h2>
-        <p class="subtitulo-formulario">Registra la consulta médica del paciente.</p>
-
-        <div class="seccion-formulario">
-            <h3 class="titulo-seccion-formulario">Datos de la cita</h3>
-
-            <div class="grupo-campo">
-                <label>Folio</label>
-                <input type="text" value="{{ cita.folio }}" readonly>
+<div class="detalle-wrapper">
+    <section class="detalle-hero">
+        <div class="detalle-hero-top">
+            <div>
+                <h1>Detalle de la Cita</h1>
+                <p>Registra la consulta médica del paciente desde un panel más claro y ordenado.</p>
             </div>
-
-            <div class="grupo-campo">
-                <label>Número de expediente</label>
-                <input type="text" value="{{ cita.numero_expediente }}" readonly>
-            </div>
-
-            <div class="grupo-campo grupo-campo-completo">
-                <label>Paciente</label>
-                <input type="text" value="{{ cita.nombre }} {{ cita.apellido_paterno }} {{ cita.apellido_materno }}" readonly>
-            </div>
-
-            <div class="grupo-campo">
-                <label>Fecha</label>
-                <input type="text" value="{{ cita.fecha }}" readonly>
-            </div>
-
-            <div class="grupo-campo">
-                <label>Hora</label>
-                <input type="text" value="{{ cita.hora }}" readonly>
-            </div>
-
-            <div class="grupo-campo">
-                <label>Especialidad</label>
-                <input type="text" value="{{ cita.especialidad }}" readonly>
-            </div>
-
-            <div class="grupo-campo grupo-campo-completo">
-                <label>Motivo</label>
-                <textarea rows="3" readonly>{{ cita.motivo }}</textarea>
-            </div>
+            <div class="detalle-badge">{{ cita.especialidad }}</div>
         </div>
+    </section>
 
-        <form method="POST" class="formulario-cita">
-            <div class="seccion-formulario">
-                <h3 class="titulo-seccion-formulario">Ficha clínica general</h3>
+    <div class="detalle-layout">
+        <aside class="panel-lateral">
+            <div class="card-lateral">
+                <h3>Resumen de la cita</h3>
 
-                <div class="grupo-campo">
-                    <label for="peso">Peso (kg)</label>
-                    <input type="number" step="0.01" id="peso" name="peso">
-                </div>
+                <div class="resumen-lista">
+                    <div class="resumen-item">
+                        <span class="resumen-label">Folio</span>
+                        <span class="resumen-valor">{{ cita.folio }}</span>
+                    </div>
 
-                <div class="grupo-campo">
-                    <label for="talla">Talla (m)</label>
-                    <input type="number" step="0.01" id="talla" name="talla">
-                </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">Número de expediente</span>
+                        <span class="resumen-valor">{{ cita.numero_expediente }}</span>
+                    </div>
 
-                <div class="grupo-campo">
-                    <label for="presion_arterial">Presión arterial</label>
-                    <input type="text" id="presion_arterial" name="presion_arterial" placeholder="120/80">
-                </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">Paciente</span>
+                        <span class="resumen-valor">{{ cita.nombre }} {{ cita.apellido_paterno }} {{ cita.apellido_materno }}</span>
+                    </div>
 
-                <div class="grupo-campo">
-                    <label for="temperatura">Temperatura</label>
-                    <input type="number" step="0.01" id="temperatura" name="temperatura">
-                </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">Fecha de la cita</span>
+                        <span class="resumen-valor">{{ cita.fecha }}</span>
+                    </div>
 
-                <div class="grupo-campo">
-                    <label for="sangre">Tipo de sangre</label>
-                    <input type="text" id="sangre" name="sangre" placeholder="O+, A-, etc.">
-                </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">Hora</span>
+                        <span class="resumen-valor">{{ cita.hora }}</span>
+                    </div>
 
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="alergias">Alergias</label>
-                    <textarea id="alergias" name="alergias" rows="3"></textarea>
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="medicamentos_actuales">Medicamentos actuales</label>
-                    <textarea id="medicamentos_actuales" name="medicamentos_actuales" rows="3"></textarea>
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="antecedentes">Antecedentes</label>
-                    <textarea id="antecedentes" name="antecedentes" rows="3"></textarea>
+                    <div class="resumen-item">
+                        <span class="resumen-label">Motivo de consulta</span>
+                        <span class="resumen-valor">{{ cita.motivo }}</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="seccion-formulario">
-                <h3 class="titulo-seccion-formulario">Consulta médica</h3>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="diagnostico">Diagnóstico</label>
-                    <textarea id="diagnostico" name="diagnostico" rows="4" required></textarea>
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="tratamiento">Tratamiento</label>
-                    <textarea id="tratamiento" name="tratamiento" rows="4" required></textarea>
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="observaciones">Observaciones</label>
-                    <textarea id="observaciones" name="observaciones" rows="4"></textarea>
+            <div class="card-lateral">
+                <h3>Navegación rápida</h3>
+                <div class="nav-rapida">
+                    <button type="button" class="nav-chip" data-open="panel-ficha">Ficha clínica</button>
+                    <button type="button" class="nav-chip" data-open="panel-consulta">Consulta</button>
+                    <button type="button" class="nav-chip" data-open="panel-especialidad">Especialidad</button>
+                    <button type="button" class="nav-chip" data-open="panel-seguimiento">Seguimiento</button>
                 </div>
             </div>
+        </aside>
 
-            {% if cita.especialidad == "Obstetricia" %}
-            <div class="seccion-formulario">
-                <h3 class="titulo-seccion-formulario">Datos específicos de obstetricia</h3>
-
-                <div class="grupo-campo">
-                    <label for="semanas_gestacion">Semanas de gestación</label>
-                    <input type="number" id="semanas_gestacion" name="semanas_gestacion">
-                </div>
-
-                <div class="grupo-campo">
-                    <label for="fum">FUM</label>
-                    <input type="date" id="fum" name="fum">
-                </div>
-
-                <div class="grupo-campo">
-                    <label for="gestas">Gestas</label>
-                    <input type="number" id="gestas" name="gestas">
-                </div>
-
-                <div class="grupo-campo">
-                    <label for="partos">Partos</label>
-                    <input type="number" id="partos" name="partos">
-                </div>
-
-                <div class="grupo-campo">
-                    <label for="cesareas">Cesáreas</label>
-                    <input type="number" id="cesareas" name="cesareas">
-                </div>
-
-                <div class="grupo-campo">
-                    <label for="abortos">Abortos</label>
-                    <input type="number" id="abortos" name="abortos">
-                </div>
-
-                <div class="grupo-campo">
-                    <label for="frecuencia_cardiaca_fetal">Frecuencia cardíaca fetal</label>
-                    <input type="text" id="frecuencia_cardiaca_fetal" name="frecuencia_cardiaca_fetal">
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="movimientos_fetales">Movimientos fetales</label>
-                    <textarea id="movimientos_fetales" name="movimientos_fetales" rows="3"></textarea>
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="observaciones_obstetricia">Observaciones obstétricas</label>
-                    <textarea id="observaciones_obstetricia" name="observaciones_obstetricia" rows="3"></textarea>
-                </div>
+        <div class="editor">
+            <div class="mini-tabs">
+                <button type="button" class="mini-tab" data-open="panel-ficha">Ficha clínica</button>
+                <button type="button" class="mini-tab" data-open="panel-consulta">Diagnóstico y tratamiento</button>
+                <button type="button" class="mini-tab" data-open="panel-especialidad">Especialidad clínica</button>
+                <button type="button" class="mini-tab" data-open="panel-seguimiento">Seguimiento</button>
             </div>
-            {% endif %}
 
-            {% if cita.especialidad == "Dermatología" %}
-            <div class="seccion-formulario">
-                <h3 class="titulo-seccion-formulario">Datos específicos de dermatología</h3>
+            <form method="POST" id="formDetalleCita">
+                <div class="accordion">
+                    <section class="accordion-item active" id="panel-ficha">
+                        <button type="button" class="accordion-trigger">
+                            <div class="accordion-title-wrap">
+                                <div class="accordion-icon">✚</div>
+                                <div>
+                                    <h3 class="accordion-title">Ficha clínica general</h3>
+                                    <p class="accordion-subtitle">Captura los signos, antecedentes y datos generales del paciente.</p>
+                                </div>
+                            </div>
+                            <span class="accordion-arrow">⌄</span>
+                        </button>
 
-                <div class="grupo-campo">
-                    <label for="tipo_lesion">Tipo de lesión</label>
-                    <input type="text" id="tipo_lesion" name="tipo_lesion">
-                </div>
-
-                <div class="grupo-campo">
-                    <label for="ubicacion_lesion">Ubicación de la lesión</label>
-                    <input type="text" id="ubicacion_lesion" name="ubicacion_lesion">
-                </div>
-
-                <div class="grupo-campo">
-                    <label for="tiempo_evolucion">Tiempo de evolución</label>
-                    <input type="text" id="tiempo_evolucion" name="tiempo_evolucion">
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="sintomas_asociados">Síntomas asociados</label>
-                    <textarea id="sintomas_asociados" name="sintomas_asociados" rows="3"></textarea>
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="tratamiento_topico">Tratamiento tópico</label>
-                    <textarea id="tratamiento_topico" name="tratamiento_topico" rows="3"></textarea>
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="observaciones_dermatologia">Observaciones dermatológicas</label>
-                    <textarea id="observaciones_dermatologia" name="observaciones_dermatologia" rows="3"></textarea>
-                </div>
-            </div>
-            {% endif %}
-
-            {% if cita.especialidad == "Nutrición" %}
-            <div class="seccion-formulario">
-                <h3 class="titulo-seccion-formulario">Datos específicos de nutrición</h3>
-
-                <div class="grupo-campo">
-                    <label for="imc">IMC</label>
-                    <input type="number" step="0.01" id="imc" name="imc">
-                </div>
-
-                <div class="grupo-campo">
-                    <label for="consumo_agua">Consumo de agua</label>
-                    <input type="text" id="consumo_agua" name="consumo_agua">
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="habitos_alimenticios">Hábitos alimenticios</label>
-                    <textarea id="habitos_alimenticios" name="habitos_alimenticios" rows="3"></textarea>
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="objetivo_nutricional">Objetivo nutricional</label>
-                    <textarea id="objetivo_nutricional" name="objetivo_nutricional" rows="3"></textarea>
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="plan_alimenticio">Plan alimenticio</label>
-                    <textarea id="plan_alimenticio" name="plan_alimenticio" rows="3"></textarea>
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="observaciones_nutricion">Observaciones nutricionales</label>
-                    <textarea id="observaciones_nutricion" name="observaciones_nutricion" rows="3"></textarea>
-                </div>
-            </div>
-            {% endif %}
-
-            {% if cita.especialidad == "Psicología" %}
-            <div class="seccion-formulario">
-                <h3 class="titulo-seccion-formulario">Datos específicos de psicología</h3>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="motivo_psicologico">Motivo psicológico</label>
-                    <textarea id="motivo_psicologico" name="motivo_psicologico" rows="3"></textarea>
-                </div>
-
-                <div class="grupo-campo">
-                    <label for="estado_emocional">Estado emocional</label>
-                    <input type="text" id="estado_emocional" name="estado_emocional">
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="evaluacion_mental">Evaluación mental</label>
-                    <textarea id="evaluacion_mental" name="evaluacion_mental" rows="3"></textarea>
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="plan_terapeutico">Plan terapéutico</label>
-                    <textarea id="plan_terapeutico" name="plan_terapeutico" rows="3"></textarea>
-                </div>
-
-                <div class="grupo-campo grupo-campo-completo">
-                    <label for="observaciones_psicologia">Observaciones psicológicas</label>
-                    <textarea id="observaciones_psicologia" name="observaciones_psicologia" rows="3"></textarea>
-                </div>
-            </div>
-            {% endif %}
-
-            <div class="grupo-campo grupo-campo-completo">
-                <button type="submit" class="btn-enviar-cita">Guardar consulta</button>
-            </div>
-        </form>
+                        <div class="accordion-body">
+                            <div class="form-grid">
+    <div class="grupo-campo">
+        <label for="peso">Peso (kg)</label>
+        <small class="campo-ayuda">Ingresa el peso actual en kilogramos. Ej. 70.5</small>
+        <input type="number" step="0.01" id="peso" name="peso" placeholder="Ej. 70.5">
     </div>
-</section>
 
+    <div class="grupo-campo">
+        <label for="talla">Talla (m)</label>
+        <small class="campo-ayuda">Captura la estatura en metros. Ej. 1.65</small>
+        <input type="number" step="0.01" id="talla" name="talla" placeholder="Ej. 1.65">
+    </div>
+
+    <div class="grupo-campo">
+        <label for="presion_arterial">Presión arterial</label>
+        <small class="campo-ayuda">Usa el formato sistólica/diastólica. Ej. 120/80</small>
+        <input type="text" id="presion_arterial" name="presion_arterial" placeholder="Ej. 120/80">
+    </div>
+
+    <div class="grupo-campo">
+        <label for="temperatura">Temperatura</label>
+        <small class="campo-ayuda">Registra la temperatura corporal en °C. Ej. 36.7</small>
+        <input type="number" step="0.01" id="temperatura" name="temperatura" placeholder="Ej. 36.7">
+    </div>
+
+    <div class="grupo-campo">
+        <label for="sangre">Tipo de sangre</label>
+        <small class="campo-ayuda">Escribe grupo y RH. Ej. O+, A-, AB+</small>
+        <input type="text" id="sangre" name="sangre" placeholder="Ej. O+">
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="alergias">Alergias</label>
+        <small class="campo-ayuda">Indica alergias conocidas a medicamentos, alimentos o sustancias.</small>
+        <textarea id="alergias" name="alergias" rows="3" placeholder="Ej. Penicilina, mariscos, polvo..."></textarea>
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="medicamentos_actuales">Medicamentos actuales</label>
+        <small class="campo-ayuda">Escribe nombre del medicamento, dosis o frecuencia si aplica.</small>
+        <textarea id="medicamentos_actuales" name="medicamentos_actuales" rows="3" placeholder="Ej. Metformina 500 mg cada 12 horas"></textarea>
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="antecedentes">Antecedentes</label>
+        <small class="campo-ayuda">Incluye padecimientos previos, cirugías, enfermedades crónicas o antecedentes relevantes.</small>
+        <textarea id="antecedentes" name="antecedentes" rows="3" placeholder="Ej. Hipotiroidismo, cesárea previa, hipertensión..."></textarea>
+    </div>
+</div>
+                        </div>
+                    </section>
+
+                    <section class="accordion-item" id="panel-consulta">
+                        <button type="button" class="accordion-trigger">
+                            <div class="accordion-title-wrap">
+                                <div class="accordion-icon">🩺</div>
+                                <div>
+                                    <h3 class="accordion-title">Diagnóstico y tratamiento</h3>
+                                    <p class="accordion-subtitle">Registra el diagnóstico, tratamiento y observaciones de la atención actual.</p>
+                                </div>
+                            </div>
+                            <span class="accordion-arrow">⌄</span>
+                        </button>
+
+                        <div class="accordion-body">
+                            <div class="form-grid">
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="diagnostico">Diagnóstico</label>
+        <small class="campo-ayuda">Describe el diagnóstico clínico encontrado durante la consulta.</small>
+        <textarea id="diagnostico" name="diagnostico" rows="4" required placeholder="Ej. Sobrepeso grado I / Dermatitis de contacto / Ansiedad leve..."></textarea>
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="tratamiento">Tratamiento</label>
+        <small class="campo-ayuda">Indica tratamiento, indicaciones, receta o plan de atención.</small>
+        <textarea id="tratamiento" name="tratamiento" rows="4" required placeholder="Ej. Dieta hipocalórica, crema tópica cada 12 horas, sesiones semanales..."></textarea>
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="observaciones">Observaciones</label>
+        <small class="campo-ayuda">Agrega notas adicionales, evolución, recomendaciones o hallazgos importantes.</small>
+        <textarea id="observaciones" name="observaciones" rows="4" placeholder="Ej. Paciente refiere mejoría parcial, continuar vigilancia..."></textarea>
+    </div>
+</div>                        </div>
+                    </section>
+
+                    <section class="accordion-item" id="panel-especialidad">
+                        <button type="button" class="accordion-trigger">
+                            <div class="accordion-title-wrap">
+                                <div class="accordion-icon">⚙</div>
+                                <div>
+                                    <h3 class="accordion-title">Especialidad clínica</h3>
+                                    <p class="accordion-subtitle">Completa únicamente los campos clínicos de {{ cita.especialidad }}.</p>
+                                </div>
+                            </div>
+                            <span class="accordion-arrow">⌄</span>
+                        </button>
+
+                        <div class="accordion-body">
+                            {% if cita.especialidad == "Obstetricia" %}
+                            <div class="form-grid">
+    <div class="grupo-campo">
+        <label for="semanas_gestacion">Semanas de gestación</label>
+        <small class="campo-ayuda">Ingresa el número de semanas actuales de embarazo.</small>
+        <input type="number" id="semanas_gestacion" name="semanas_gestacion" placeholder="Ej. 24">
+    </div>
+
+    <div class="grupo-campo">
+        <label for="fum">FUM</label>
+        <small class="campo-ayuda">Selecciona la fecha de última menstruación.</small>
+        <input type="date" id="fum" name="fum">
+    </div>
+
+    <div class="grupo-campo">
+        <label for="gestas">Gestas</label>
+        <small class="campo-ayuda">Número total de gestaciones.</small>
+        <input type="number" id="gestas" name="gestas" placeholder="Ej. 2">
+    </div>
+
+    <div class="grupo-campo">
+        <label for="partos">Partos</label>
+        <small class="campo-ayuda">Número de partos previos.</small>
+        <input type="number" id="partos" name="partos" placeholder="Ej. 1">
+    </div>
+
+    <div class="grupo-campo">
+        <label for="cesareas">Cesáreas</label>
+        <small class="campo-ayuda">Número de cesáreas previas.</small>
+        <input type="number" id="cesareas" name="cesareas" placeholder="Ej. 0">
+    </div>
+
+    <div class="grupo-campo">
+        <label for="abortos">Abortos</label>
+        <small class="campo-ayuda">Número de abortos previos.</small>
+        <input type="number" id="abortos" name="abortos" placeholder="Ej. 0">
+    </div>
+
+    <div class="grupo-campo">
+        <label for="frecuencia_cardiaca_fetal">Frecuencia cardíaca fetal</label>
+        <small class="campo-ayuda">Escribe el valor en lpm. Ej. 145 lpm</small>
+        <input type="text" id="frecuencia_cardiaca_fetal" name="frecuencia_cardiaca_fetal" placeholder="Ej. 145 lpm">
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="movimientos_fetales">Movimientos fetales</label>
+        <small class="campo-ayuda">Describe presencia, frecuencia o percepción de movimientos fetales.</small>
+        <textarea id="movimientos_fetales" name="movimientos_fetales" rows="3" placeholder="Ej. Presentes, normales, percibidos por la paciente"></textarea>
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="observaciones_obstetricia">Observaciones obstétricas</label>
+        <small class="campo-ayuda">Agrega hallazgos clínicos u observaciones relevantes del control prenatal.</small>
+        <textarea id="observaciones_obstetricia" name="observaciones_obstetricia" rows="3" placeholder="Ej. Embarazo normoevolutivo, continuar control prenatal..."></textarea>
+    </div>
+</div>
+                            {% endif %}
+
+                            {% if cita.especialidad == "Dermatología" %}
+                            <div class="form-grid">
+    <div class="grupo-campo">
+        <label for="tipo_lesion">Tipo de lesión</label>
+        <small class="campo-ayuda">Describe el tipo de lesión observada. Ej. Mácula, pápula, placa</small>
+        <input type="text" id="tipo_lesion" name="tipo_lesion" placeholder="Ej. Pápula eritematosa">
+    </div>
+
+    <div class="grupo-campo">
+        <label for="ubicacion_lesion">Ubicación de la lesión</label>
+        <small class="campo-ayuda">Indica zona anatómica afectada.</small>
+        <input type="text" id="ubicacion_lesion" name="ubicacion_lesion" placeholder="Ej. Antebrazo derecho">
+    </div>
+
+    <div class="grupo-campo">
+        <label for="tiempo_evolucion">Tiempo de evolución</label>
+        <small class="campo-ayuda">Especifica cuánto tiempo lleva la lesión. Ej. 2 semanas</small>
+        <input type="text" id="tiempo_evolucion" name="tiempo_evolucion" placeholder="Ej. 2 semanas">
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="sintomas_asociados">Síntomas asociados</label>
+        <small class="campo-ayuda">Describe síntomas acompañantes como prurito, ardor o dolor.</small>
+        <textarea id="sintomas_asociados" name="sintomas_asociados" rows="3" placeholder="Ej. Prurito leve, ardor ocasional..."></textarea>
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="tratamiento_topico">Tratamiento tópico</label>
+        <small class="campo-ayuda">Escribe crema, loción o medicamento tópico indicado.</small>
+        <textarea id="tratamiento_topico" name="tratamiento_topico" rows="3" placeholder="Ej. Hidrocortisona tópica cada 12 horas"></textarea>
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="observaciones_dermatologia">Observaciones dermatológicas</label>
+        <small class="campo-ayuda">Anota hallazgos o recomendaciones específicas de la revisión dermatológica.</small>
+        <textarea id="observaciones_dermatologia" name="observaciones_dermatologia" rows="3" placeholder="Ej. Evitar exposición solar directa, reevaluar en 15 días..."></textarea>
+    </div>
+</div>
+                            {% endif %}
+
+                            {% if cita.especialidad == "Nutrición" or cita.especialidad == "Nutriología" %}
+                            <div class="form-grid">
+    <div class="grupo-campo">
+        <label for="imc">IMC</label>
+        <small class="campo-ayuda">Captura el índice de masa corporal. Ej. 24.8</small>
+        <input type="number" step="0.01" id="imc" name="imc" placeholder="Ej. 24.8">
+    </div>
+
+    <div class="grupo-campo">
+        <label for="consumo_agua">Consumo de agua</label>
+        <small class="campo-ayuda">Indica consumo aproximado diario. Ej. 2 litros al día</small>
+        <input type="text" id="consumo_agua" name="consumo_agua" placeholder="Ej. 2 litros al día">
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="habitos_alimenticios">Hábitos alimenticios</label>
+        <small class="campo-ayuda">Describe horarios, calidad de dieta, frecuencia de comidas o hábitos relevantes.</small>
+        <textarea id="habitos_alimenticios" name="habitos_alimenticios" rows="3" placeholder="Ej. Omite desayuno, consume refresco diario..."></textarea>
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="objetivo_nutricional">Objetivo nutricional</label>
+        <small class="campo-ayuda">Escribe la meta principal del tratamiento nutricional.</small>
+        <textarea id="objetivo_nutricional" name="objetivo_nutricional" rows="3" placeholder="Ej. Reducción de peso, control glucémico, ganancia muscular..."></textarea>
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="plan_alimenticio">Plan alimenticio</label>
+        <small class="campo-ayuda">Resume la estrategia alimentaria o indicaciones dietéticas.</small>
+        <textarea id="plan_alimenticio" name="plan_alimenticio" rows="3" placeholder="Ej. Plan de 5 tiempos, reducción de azúcares simples..."></textarea>
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="observaciones_nutricion">Observaciones nutricionales</label>
+        <small class="campo-ayuda">Añade notas clínicas complementarias sobre evolución, apego o riesgos.</small>
+        <textarea id="observaciones_nutricion" name="observaciones_nutricion" rows="3" placeholder="Ej. Buen apego al tratamiento, requiere seguimiento mensual..."></textarea>
+    </div>
+</div>
+                            {% endif %}
+
+                            {% if cita.especialidad == "Psicología" %}
+                            <div class="form-grid">
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="motivo_psicologico">Motivo psicológico</label>
+        <small class="campo-ayuda">Describe el motivo principal de atención psicológica.</small>
+        <textarea id="motivo_psicologico" name="motivo_psicologico" rows="3" placeholder="Ej. Ansiedad laboral, duelo, dificultad para dormir..."></textarea>
+    </div>
+
+    <div class="grupo-campo">
+        <label for="estado_emocional">Estado emocional</label>
+        <small class="campo-ayuda">Resume el estado emocional observado o referido.</small>
+        <input type="text" id="estado_emocional" name="estado_emocional" placeholder="Ej. Ansioso, estable, triste">
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="evaluacion_mental">Evaluación mental</label>
+        <small class="campo-ayuda">Registra observaciones de orientación, pensamiento, lenguaje, conducta o juicio.</small>
+        <textarea id="evaluacion_mental" name="evaluacion_mental" rows="3" placeholder="Ej. Orientado en tiempo, espacio y persona..."></textarea>
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="plan_terapeutico">Plan terapéutico</label>
+        <small class="campo-ayuda">Escribe el plan de intervención o seguimiento psicológico.</small>
+        <textarea id="plan_terapeutico" name="plan_terapeutico" rows="3" placeholder="Ej. Terapia cognitivo-conductual semanal..."></textarea>
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="observaciones_psicologia">Observaciones psicológicas</label>
+        <small class="campo-ayuda">Agrega notas clínicas, evolución o consideraciones relevantes.</small>
+        <textarea id="observaciones_psicologia" name="observaciones_psicologia" rows="3" placeholder="Ej. Buena disposición al tratamiento, sin ideación suicida..."></textarea>
+    </div>
+</div>
+                            {% endif %}
+                        </div>
+                    </section>
+
+                    <section class="accordion-item" id="panel-seguimiento">
+                        <button type="button" class="accordion-trigger">
+                            <div class="accordion-title-wrap">
+                                <div class="accordion-icon">📅</div>
+                                <div>
+                                    <h3 class="accordion-title">Seguimiento</h3>
+                                    <p class="accordion-subtitle">Configura una segunda cita solo si la consulta lo requiere.</p>
+                                </div>
+                            </div>
+                            <span class="accordion-arrow">⌄</span>
+                        </button>
+
+                        <div class="accordion-body">
+                            <div class="seguimiento-panel">
+                                <div class="seguimiento-top">
+                                    <div>
+                                        <h4>Seguimiento de la cita</h4>
+                                        <p>
+                                            Activa esta opción si al finalizar la consulta necesitas dejar programada
+                                            una segunda cita para el paciente.
+                                        </p>
+                                    </div>
+
+                                    <label class="switch-seguimiento" for="activarSeguimiento">
+                                        <input type="checkbox" id="activarSeguimiento">
+                                        <span>El paciente requiere una segunda cita</span>
+                                    </label>
+                                </div>
+
+                                <input type="hidden" name="requiere_seguimiento" id="requiere_seguimiento" value="0">
+
+                                <div class="seguimiento-acciones">
+                                    <button type="button" class="btn-seguimiento" id="btnAbrirModalSeguimiento" disabled>
+                                        Configurar segunda cita
+                                    </button>
+
+                                    <div class="seguimiento-resumen" id="seguimientoResumen">
+                                        No se ha programado una cita de seguimiento.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="card-guardar">
+                    <h3>Guardar consulta</h3>
+                    <p>Cuando termines de capturar la información clínica, guarda la consulta del paciente.</p>
+                    <button type="submit" class="btn-enviar-cita">Guardar consulta</button>
+                </div>
+
+                <div class="modal-seguimiento" id="modalSeguimiento">
+                    <div class="modal-seguimiento-contenido">
+                        <div class="modal-seguimiento-header">
+                            <div>
+                                <h3>Agendar cita de seguimiento</h3>
+                                <p>Programa la próxima revisión del paciente sin salir de esta consulta.</p>
+                            </div>
+
+                            <button type="button" class="btn-cerrar-modal" id="btnCerrarModalSeguimiento">×</button>
+                        </div>
+
+                        <div class="modal-grid">
+    <div class="grupo-campo">
+        <label for="fecha_seguimiento">Fecha</label>
+        <small class="campo-ayuda">Selecciona la fecha propuesta para la siguiente cita.</small>
+        <input type="date" id="fecha_seguimiento" name="fecha_seguimiento">
+    </div>
+
+    <div class="grupo-campo">
+        <label for="hora_seguimiento">Hora</label>
+        <small class="campo-ayuda">Elige un horario disponible para el seguimiento.</small>
+        <select id="hora_seguimiento" name="hora_seguimiento">
+            <option value="">Selecciona una hora</option>
+            <option value="09:00">09:00</option>
+            <option value="10:00">10:00</option>
+            <option value="11:00">11:00</option>
+            <option value="12:00">12:00</option>
+            <option value="13:00">13:00</option>
+            <option value="16:00">16:00</option>
+            <option value="17:00">17:00</option>
+            <option value="18:00">18:00</option>
+        </select>
+    </div>
+
+    <div class="grupo-campo grupo-campo-completo">
+        <label for="motivo_seguimiento">Motivo de seguimiento</label>
+        <small class="campo-ayuda">Explica brevemente por qué se agenda la segunda cita.</small>
+        <textarea
+            id="motivo_seguimiento"
+            name="motivo_seguimiento"
+            rows="4"
+            placeholder="Ej. revisión de evolución, control clínico, ajuste de tratamiento..."></textarea>
+        <div class="mensaje-error-seguimiento" id="errorSeguimiento">
+            Completa fecha, hora y motivo para guardar el seguimiento.
+        </div>
+    </div>
+</div>
+
+                        <div class="modal-seguimiento-footer">
+                            <button type="button" class="btn-modal-secundario" id="btnCancelarSeguimiento">
+                                Cancelar
+                            </button>
+                            <button type="button" class="btn-modal-primario" id="btnGuardarSeguimientoModal">
+                                Guardar seguimiento
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const accordionItems = document.querySelectorAll(".accordion-item");
+    const openButtons = document.querySelectorAll("[data-open]");
+
+    function abrirPanel(idPanel) {
+        accordionItems.forEach(item => {
+            if (item.id === idPanel) {
+                item.classList.add("active");
+                item.scrollIntoView({ behavior: "smooth", block: "start" });
+            } else {
+                item.classList.remove("active");
+            }
+        });
+    }
+
+    accordionItems.forEach(item => {
+        const trigger = item.querySelector(".accordion-trigger");
+        trigger.addEventListener("click", function () {
+            const activo = item.classList.contains("active");
+
+            accordionItems.forEach(bloque => bloque.classList.remove("active"));
+
+            if (!activo) {
+                item.classList.add("active");
+            }
+        });
+    });
+
+    openButtons.forEach(btn => {
+        btn.addEventListener("click", function () {
+            abrirPanel(this.dataset.open);
+        });
+    });
+
+    const formDetalleCita = document.getElementById("formDetalleCita");
+    const activarSeguimiento = document.getElementById("activarSeguimiento");
+    const requiereSeguimiento = document.getElementById("requiere_seguimiento");
+    const btnAbrirModalSeguimiento = document.getElementById("btnAbrirModalSeguimiento");
+    const modalSeguimiento = document.getElementById("modalSeguimiento");
+    const btnCerrarModalSeguimiento = document.getElementById("btnCerrarModalSeguimiento");
+    const btnCancelarSeguimiento = document.getElementById("btnCancelarSeguimiento");
+    const btnGuardarSeguimientoModal = document.getElementById("btnGuardarSeguimientoModal");
+    const fechaSeguimiento = document.getElementById("fecha_seguimiento");
+    const horaSeguimiento = document.getElementById("hora_seguimiento");
+    const motivoSeguimiento = document.getElementById("motivo_seguimiento");
+    const seguimientoResumen = document.getElementById("seguimientoResumen");
+    const errorSeguimiento = document.getElementById("errorSeguimiento");
+
+    const hoy = new Date().toISOString().split("T")[0];
+    fechaSeguimiento.min = hoy;
+
+    function abrirModalSeguimiento() {
+        modalSeguimiento.classList.add("activo");
+        document.body.style.overflow = "hidden";
+    }
+
+    function cerrarModalSeguimiento() {
+        modalSeguimiento.classList.remove("activo");
+        document.body.style.overflow = "";
+        errorSeguimiento.classList.remove("activo");
+    }
+
+    function limpiarSeguimiento() {
+        fechaSeguimiento.value = "";
+        horaSeguimiento.value = "";
+        motivoSeguimiento.value = "";
+        seguimientoResumen.innerHTML = "No se ha programado una cita de seguimiento.";
+        errorSeguimiento.classList.remove("activo");
+    }
+
+    function formatearFecha(fecha) {
+        const partes = fecha.split("-");
+        if (partes.length !== 3) return fecha;
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+
+    activarSeguimiento.addEventListener("change", function () {
+        if (this.checked) {
+            requiereSeguimiento.value = "1";
+            btnAbrirModalSeguimiento.disabled = false;
+            seguimientoResumen.innerHTML = "Seguimiento activado. Falta definir la fecha, la hora y el motivo.";
+        } else {
+            requiereSeguimiento.value = "0";
+            btnAbrirModalSeguimiento.disabled = true;
+            limpiarSeguimiento();
+        }
+    });
+
+    btnAbrirModalSeguimiento.addEventListener("click", function () {
+        if (!activarSeguimiento.checked) return;
+        abrirModalSeguimiento();
+    });
+
+    btnCerrarModalSeguimiento.addEventListener("click", cerrarModalSeguimiento);
+    btnCancelarSeguimiento.addEventListener("click", cerrarModalSeguimiento);
+
+    modalSeguimiento.addEventListener("click", function (e) {
+        if (e.target === modalSeguimiento) {
+            cerrarModalSeguimiento();
+        }
+    });
+
+    btnGuardarSeguimientoModal.addEventListener("click", function () {
+        const fecha = fechaSeguimiento.value.trim();
+        const hora = horaSeguimiento.value.trim();
+        const motivo = motivoSeguimiento.value.trim();
+
+        if (!fecha || !hora || !motivo) {
+            errorSeguimiento.classList.add("activo");
+            return;
+        }
+
+        errorSeguimiento.classList.remove("activo");
+        seguimientoResumen.innerHTML = `
+            <strong>Seguimiento programado:</strong><br>
+            Fecha: ${formatearFecha(fecha)}<br>
+            Hora: ${hora}<br>
+            Motivo: ${motivo}
+        `;
+        cerrarModalSeguimiento();
+    });
+
+    formDetalleCita.addEventListener("submit", function (e) {
+        if (requiereSeguimiento.value === "1") {
+            const fecha = fechaSeguimiento.value.trim();
+            const hora = horaSeguimiento.value.trim();
+            const motivo = motivoSeguimiento.value.trim();
+
+            if (!fecha || !hora || !motivo) {
+                e.preventDefault();
+                errorSeguimiento.classList.add("activo");
+                abrirPanel("panel-seguimiento");
+                abrirModalSeguimiento();
+            }
+        }
+    });
+</script>
 </body>
 </html>
