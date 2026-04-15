@@ -222,7 +222,7 @@ def expedientes():
         return redirect(url_for("auth.login"))
 
     busqueda = request.args.get("q", "").strip()
-    expedientes = obtener_lista_expedientes(busqueda)
+    expedientes = obtener_lista_expedientes(id_doctor, busqueda)
     return render_template("expedientes.html", expedientes=expedientes)
 
 @medico.route("/expediente/<int:id_paciente>")

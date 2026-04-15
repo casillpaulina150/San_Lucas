@@ -427,7 +427,7 @@ def obtener_expediente_completo(id_paciente):
     return paciente, historial
 
 
-def obtener_lista_expedientes(busqueda=""):
+def obtener_lista_expedientes(id_doctor, busqueda=""):
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
 
@@ -441,12 +441,15 @@ def obtener_lista_expedientes(busqueda=""):
             MIN(CONCAT(c.fecha, ' ', c.hora)) AS primera_modificacion,
             MAX(CONCAT(c.fecha, ' ', c.hora)) AS ultima_modificacion
         FROM pacientes p
-        LEFT JOIN citas c ON p.id_paciente = c.id_paciente
-        WHERE (%s = ''
-            OR p.numero_expediente LIKE %s
-            OR p.nombre LIKE %s
-            OR p.apellido_paterno LIKE %s
-            OR p.apellido_materno LIKE %s)
+        INNER JOIN citas c ON p.id_paciente = c.id_paciente
+        WHERE c.id_doctor = %s
+          AND (
+                %s = ''
+                OR p.numero_expediente LIKE %s
+                OR p.nombre LIKE %s
+                OR p.apellido_paterno LIKE %s
+                OR p.apellido_materno LIKE %s
+              )
         GROUP BY
             p.id_paciente,
             p.numero_expediente,
@@ -455,8 +458,9 @@ def obtener_lista_expedientes(busqueda=""):
             p.apellido_materno
         ORDER BY p.numero_expediente ASC
     """
+
     like = f"%{busqueda}%"
-    cursor.execute(query, (busqueda, like, like, like, like))
+    cursor.execute(query, (id_doctor, busqueda, like, like, like, like))
     resultados = cursor.fetchall()
 
     cursor.close()
